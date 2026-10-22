@@ -611,13 +611,13 @@
       },
       {
         id: 'sahap',
-        name: 'Sahap',
+        name: 'Muhammad Sahap',
         gender: 'M',
-        aliases: ['sahap', 'bang sahap'],
-        role: 'Kasir Adamart 73',
+        aliases: ['sahap', 'muhammad sahap', 'bang sahap', 'kasir 73', '73'],
+        role: 'Kasir Toko Adamart 73',
         unit: 'Minimarket Adamart 73',
         deskId: 'desk-adamart73',
-        deskName: 'Kasir Minimarket Adamart 73 (Sahap)',
+        deskName: 'Kasir Adamart 73 (Muhammad Sahap)',
         // Cashier chair tucked in facing store counter & POS register (-X)
         deskPosition: { x: 6.12, z: -4.0 },
         deskRotation: -Math.PI / 2,
@@ -626,7 +626,7 @@
         status: 'Belum Hadir',
         locationStr: 'Store Adamart 73 (-2.176007, 115.423090)',
         color: 0xe11d48, // Red / Minimarket Uniform
-        hairColor: 0x334155,
+        hairColor: 0x1e293b,
         currentActivity: 'Duduk di Kasir POS Adamart 73',
         targetX: 6.12, targetZ: -4.0,
         curX: 6.12, curZ: -4.0,
@@ -637,14 +637,14 @@
         hud: null
       },
       {
-        id: 'rika-kelanis',
-        name: 'Rika (Kelanis)',
+        id: 'kasir-kelanis',
+        name: 'Azimah',
         gender: 'F',
-        aliases: ['rika kelanis', 'kasir kelanis', 'kelanis'],
-        role: 'Kasir Adamart Kelanis (Standby / Pengembangan)',
+        aliases: ['azimah', 'aida', 'alhamdi', 'kasir kelanis', 'kelanis'],
+        role: 'Kasir Toko Adamart Kelanis',
         unit: 'Minimarket Adamart Kelanis',
         deskId: 'desk-kelanis',
-        deskName: 'Kasir Minimarket Kelanis (Rika - Standby)',
+        deskName: 'Kasir Adamart Kelanis (Azimah)',
         // Cashier chair tucked in facing store counter & POS register (-X)
         deskPosition: { x: 6.12, z: 3.5 },
         deskRotation: -Math.PI / 2,
@@ -652,8 +652,8 @@
         checkOut: '--:--',
         status: 'Belum Hadir',
         locationStr: 'Store Adamart Kelanis (-2.176007, 115.423090)',
-        color: 0xd97706, // Amber Gold
-        hairColor: 0xb45309,
+        color: 0xd97706, // Amber Gold Minimarket Uniform
+        hairColor: 0x475569, // Hijab
         currentActivity: 'Duduk di Kasir POS Adamart Kelanis',
         targetX: 6.12, targetZ: 3.5,
         curX: 6.12, curZ: 3.5,
@@ -1329,19 +1329,19 @@
     function buildMinimarketStore() {
       const storeGroup = new THREE.Group();
 
-      // Kasir Adamart 73 (Sahap)
+      // Kasir Adamart 73 (Muhammad Sahap)
       const pos73 = createAlfamartCounter('ADAMART 73', '#e11d48', '#0284c7');
       pos73.position.set(5.5, 0, -4);
       pos73.rotation.y = -Math.PI / 2;
       storeGroup.add(pos73);
-      createDeskTag('Kasir Adamart 73 (Sahap)', 5.5, 1.35, -4, 'sahap');
+      createDeskTag('Kasir Adamart 73 (Muhammad Sahap)', 5.5, 1.35, -4, 'sahap');
 
-      // Kasir Adamart Kelanis
+      // Kasir Adamart Kelanis (Azimah)
       const posKelanis = createAlfamartCounter('ADAMART KELANIS', '#d97706', '#059669');
       posKelanis.position.set(5.5, 0, 3.5);
       posKelanis.rotation.y = -Math.PI / 2;
       storeGroup.add(posKelanis);
-      createDeskTag('Kasir Adamart Kelanis (Rika - Standby)', 5.5, 1.35, 3.5, 'rika-kelanis');
+      createDeskTag('Kasir Adamart Kelanis (Azimah)', 5.5, 1.35, 3.5, 'kasir-kelanis');
 
       const chiller = createMinimarketChiller();
       chiller.position.set(9.5, 0, -6.5);
@@ -1828,6 +1828,14 @@
       ALL_DESK_TAGS.push({ text, div, label, x, y, z, assignedStaffId });
     }
 
+    function updateDeskTagText(staffId, newText) {
+      const tag = ALL_DESK_TAGS.find(t => t.assignedStaffId === staffId);
+      if (tag && tag.div) {
+        tag.text = newText;
+        tag.div.innerText = newText;
+      }
+    }
+
     function refreshDeskTagsVisibility() {
       ALL_DESK_TAGS.forEach(tag => {
         if (!areDeskTagsEnabled) {
@@ -2161,6 +2169,8 @@
     function updateHudLabel(staff) {
       const hudEl = document.getElementById(`hud-${staff.id}`);
       if (hudEl) {
+        const nameEl = hudEl.querySelector('.hud-bubble-name span.font-bold');
+        if (nameEl) nameEl.textContent = staff.name;
         const actEl = hudEl.querySelector('.activity-text');
         if (actEl) actEl.textContent = staff.currentActivity;
         const checkEl = hudEl.querySelector('.checkin-badge');
@@ -2170,9 +2180,26 @@
         }
       }
       if (selectedStaff && selectedStaff.id === staff.id) {
-        document.getElementById('modal-status-badge').innerHTML = `
-          <span class="w-1.5 h-1.5 rounded-full ${staff.status === 'Hadir' ? 'bg-emerald-400' : 'bg-rose-400'} pulse-dot"></span> ${staff.currentActivity}
-        `;
+        const avEl = document.getElementById('modal-avatar');
+        if (avEl) avEl.innerText = staff.name.substring(0, 1).toUpperCase();
+        const nmEl = document.getElementById('modal-name');
+        if (nmEl) nmEl.innerText = staff.name;
+        const rlEl = document.getElementById('modal-role');
+        if (rlEl) rlEl.innerText = staff.role;
+        const dkEl = document.getElementById('modal-desk');
+        if (dkEl) dkEl.innerHTML = `<i class="ph ph-desktop text-indigo-400"></i> ${staff.deskName}`;
+        const locEl = document.getElementById('modal-location');
+        if (locEl) locEl.innerText = `📍 ${staff.locationStr}`;
+        const ciEl = document.getElementById('modal-checkin');
+        if (ciEl) ciEl.innerText = staff.checkIn;
+        const coEl = document.getElementById('modal-checkout');
+        if (coEl) coEl.innerText = staff.checkOut;
+        const badgeEl = document.getElementById('modal-status-badge');
+        if (badgeEl) {
+          badgeEl.innerHTML = `
+            <span class="w-1.5 h-1.5 rounded-full ${staff.status === 'Hadir' ? 'bg-emerald-400' : 'bg-rose-400'} pulse-dot"></span> ${staff.currentActivity}
+          `;
+        }
       }
     }
 
@@ -2470,10 +2497,10 @@
           // 1. Direct match on normalized keys
           for (const k of searchKeys) {
             if (absensiHadirMap[k]) {
-              // Special case: if this is rika-kelanis, only match if the check-in explicitly mentions kelanis
-              if (staff.id === 'rika-kelanis') {
+              // Special case: if this is kasir-kelanis, match if key or location mentions kelanis or azimah
+              if (staff.id === 'kasir-kelanis') {
                 const rowLok = (absensiHadirMap[k].lokasi || '').toLowerCase();
-                if (!k.includes('kelanis') && !rowLok.includes('kelanis')) {
+                if (!k.includes('kelanis') && !k.includes('azimah') && !rowLok.includes('kelanis')) {
                   continue;
                 }
               }
@@ -2487,9 +2514,9 @@
             for (const [absName, absData] of Object.entries(absensiHadirMap)) {
               for (const k of searchKeys) {
                 if (k.length >= 3 && (absName.includes(k) || k.includes(absName))) {
-                  if (staff.id === 'rika-kelanis') {
+                  if (staff.id === 'kasir-kelanis') {
                     const rowLok = (absData.lokasi || '').toLowerCase();
-                    if (!absName.includes('kelanis') && !rowLok.includes('kelanis')) {
+                    if (!absName.includes('kelanis') && !absName.includes('azimah') && !rowLok.includes('kelanis')) {
                       continue;
                     }
                   }
@@ -2595,6 +2622,24 @@
           let earliest73 = null, latest73 = null, name73 = null;
           let earliestKelanis = null, latestKelanis = null, nameKelanis = null;
 
+          // Temukan nama kasir terbaru langsung dari database web app POS
+          let latestKnownKasir73 = null;
+          let latestKnownKasirKelanis = null;
+          for (let i = res.data.length - 1; i >= 1; i--) {
+            const row = res.data[i];
+            const lok = String(row[4] || '').toLowerCase().trim();
+            const ksr = String(row[5] || '').trim();
+            if (ksr) {
+              if (!latestKnownKasir73 && lok.includes('73')) {
+                latestKnownKasir73 = ksr;
+              }
+              if (!latestKnownKasirKelanis && lok.includes('kelanis')) {
+                latestKnownKasirKelanis = ksr;
+              }
+            }
+            if (latestKnownKasir73 && latestKnownKasirKelanis) break;
+          }
+
           for (let i = 1; i < res.data.length; i++) {
             const row = res.data[i];
             const rowDate = row[0];
@@ -2651,11 +2696,12 @@
           // 1. Kasir Adamart 73
           const staff73 = STAFF_ROSTER.find(s => s.id === 'sahap');
           if (staff73) {
+            const activeName73 = name73 || latestKnownKasir73 || 'Muhammad Sahap';
+            staff73.name = activeName73;
+            staff73.deskName = `Kasir Adamart 73 (${activeName73})`;
+            updateDeskTagText('sahap', `Kasir Adamart 73 (${activeName73})`);
+
             if (count73 > 0) {
-              if (name73) {
-                staff73.name = name73;
-                staff73.deskName = `Kasir Adamart 73 (${name73})`;
-              }
               staff73.checkIn = (earliest73 || '08:00').replace(/\./g, ':').substring(0, 8);
               staff73.status = 'Hadir';
               staff73.locationStr = `Store Adamart 73 (${count73} Transaksi, Omzet: Rp ${sales73.toLocaleString('id-ID')})`;
@@ -2671,13 +2717,14 @@
           }
 
           // 2. Kasir Adamart Kelanis
-          const staffKelanis = STAFF_ROSTER.find(s => s.id === 'rika-kelanis');
+          const staffKelanis = STAFF_ROSTER.find(s => s.id === 'kasir-kelanis');
           if (staffKelanis) {
+            const activeNameKelanis = nameKelanis || latestKnownKasirKelanis || 'Azimah';
+            staffKelanis.name = activeNameKelanis;
+            staffKelanis.deskName = `Kasir Adamart Kelanis (${activeNameKelanis})`;
+            updateDeskTagText('kasir-kelanis', `Kasir Adamart Kelanis (${activeNameKelanis})`);
+
             if (countKelanis > 0) {
-              if (nameKelanis) {
-                staffKelanis.name = nameKelanis;
-                staffKelanis.deskName = `Kasir Adamart Kelanis (${nameKelanis})`;
-              }
               staffKelanis.checkIn = (earliestKelanis || '06:00').replace(/\./g, ':').substring(0, 8);
               staffKelanis.status = 'Hadir';
               staffKelanis.locationStr = `Store Adamart Kelanis (${countKelanis} Transaksi, Omzet: Rp ${salesKelanis.toLocaleString('id-ID')})`;
@@ -2713,6 +2760,11 @@
               const badgeTime = dockBtn.querySelector('p.font-mono');
               const iconBox = dockBtn.querySelector('span');
               if (nameP) nameP.textContent = staff.name;
+              if (iconBox) {
+                const words = staff.name.trim().split(/\s+/);
+                const initials = words.length > 1 ? (words[0][0] + words[1][0]).toUpperCase() : staff.name.substring(0, 2).toUpperCase();
+                iconBox.textContent = initials;
+              }
 
               if (staff.status === 'Hadir') {
                 dockBtn.classList.remove('opacity-50');
