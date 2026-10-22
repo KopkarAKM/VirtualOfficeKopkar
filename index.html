@@ -219,8 +219,8 @@
             <button onclick="selectPreset('manager-kop', 'Pak Fedrik')" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs text-slate-200 hover:bg-indigo-600/30 hover:text-white flex items-center gap-2 transition-all">
               <i class="ph ph-crown text-blue-400"></i> <span>Meja Pak Fedrik (Manajer Kop)</span>
             </button>
-            <button onclick="selectPreset('manager-ada', 'Pak Mahmuda')" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs text-slate-200 hover:bg-indigo-600/30 hover:text-white flex items-center gap-2 transition-all">
-              <i class="ph ph-user-circle text-emerald-400"></i> <span>Meja Pak Mahmuda (Manajer Ada)</span>
+            <button onclick="selectPreset('manager-ada', 'Ibu Mahmudah')" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs text-slate-200 hover:bg-indigo-600/30 hover:text-white flex items-center gap-2 transition-all">
+              <i class="ph ph-user-circle text-emerald-400"></i> <span>Meja Ibu Mahmudah (Manajer Ada)</span>
             </button>
             <button onclick="selectPreset('finance', 'Keuangan')" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs text-slate-200 hover:bg-indigo-600/30 hover:text-white flex items-center gap-2 transition-all">
               <i class="ph ph-currency-circle-dollar text-indigo-400"></i> <span>Meja Keuangan (Sri &amp; Rika)</span>
@@ -578,7 +578,18 @@
         status: 'Belum Hadir',
         locationStr: 'Kantor Kopkar AKM (-2.176007, 115.423090)',
         color: 0x1e3a8a, // Navy Executive Suit
-        hairColor: 0x111827,
+        topColor: 0x1e3a8a,
+        pantsColor: 0x0f172a,
+        skinColor: 0xffd1a4,
+        hairColor: 0x18181b,
+        hasGlasses: true,
+        glassesStyle: 'square',
+        glassesColor: 0x1e293b,
+        hasHijab: false,
+        hasCap: false,
+        shoeType: 'formal',
+        shoeColor: 0x0a0a0a,
+        accessory: 'tie',
         currentActivity: 'Duduk di Meja Manajer Koperasi',
         targetX: -8.48, targetZ: -4.68,
         curX: -8.48, curZ: -4.68,
@@ -590,18 +601,18 @@
       },
       {
         id: 'mahmuda',
-        name: 'Mahmuda',
-        gender: 'M',
+        name: 'Ibu Mahmudah',
+        gender: 'F',
         phone: '628125171659',
         phoneDisplay: '+62 812-5171-659',
-        waGreeting: 'Halo Pak Mahmuda, saya ingin berkonsultasi mengenai kemitraan / supplier / operasional Minimarket Adamart...',
+        waGreeting: 'Halo Ibu Mahmudah, saya ingin berkonsultasi mengenai kemitraan / supplier / operasional Minimarket Adamart...',
         serviceCategory: 'Retail & Minimarket Adamart',
         serviceDesc: 'Manajerial Operasional Toko Adamart 73 & Kelanis, Kerjasama Supplier Barang, Pasokan Sembako & Retail.',
-        aliases: ['mahmuda', 'mahmudah', 'pak mahmuda', 'pak mahmudah'],
+        aliases: ['mahmuda', 'mahmudah', 'ibu mahmuda', 'ibu mahmudah', 'pak mahmuda'],
         role: 'Manajer Adamart',
         unit: 'Manajerial Retail Adamart',
         deskId: 'desk-manager-ada',
-        deskName: 'Meja Manajer Adamart (Pak Mahmuda)',
+        deskName: 'Meja Manajer Adamart (Ibu Mahmudah)',
         // Chair coordinate tucked in at Adamart Manager workstation facing desk
         deskPosition: { x: -3.5, z: -5.62 },
         deskRotation: 0, // Facing desk forward (+Z)
@@ -610,7 +621,18 @@
         status: 'Belum Hadir',
         locationStr: 'Kantor Kopkar AKM (-2.176007, 115.423090)',
         color: 0x059669, // Forest Green Blazer
-        hairColor: 0x1f2937,
+        topColor: 0x059669,
+        pantsColor: 0x1e293b,
+        skinColor: 0xffdfc4,
+        hasGlasses: true,
+        glassesStyle: 'round',
+        glassesColor: 0xd97706, // Elegant Gold Rim
+        hasHijab: true,
+        hijabColor: 0x9a3412, // Sienna / Terracotta Hijab
+        hasCap: false,
+        shoeType: 'formal',
+        shoeColor: 0x111827,
+        accessory: 'lanyard',
         currentActivity: 'Duduk di Meja Manajer Adamart',
         targetX: -3.5, targetZ: -5.62,
         curX: -3.5, curZ: -5.62,
@@ -642,7 +664,16 @@
         status: 'Belum Hadir',
         locationStr: 'Kantor Kopkar AKM (-2.176007, 115.423090)',
         color: 0x6366f1, // Indigo / Modern Violet
-        hairColor: 0x4338ca,
+        topColor: 0x6366f1,
+        pantsColor: 0x1e293b,
+        skinColor: 0xffe2cd,
+        hasGlasses: false,
+        hasHijab: true,
+        hijabColor: 0x4338ca, // Deep Sapphire Hijab
+        hasCap: false,
+        shoeType: 'formal',
+        shoeColor: 0x0f172a,
+        accessory: 'lanyard',
         currentActivity: 'Duduk di Meja Keuangan (Mbak Sri)',
         targetX: -8.02, targetZ: 1.8,
         curX: -8.02, curZ: 1.8,
@@ -674,7 +705,16 @@
         status: 'Belum Hadir',
         locationStr: 'Kantor Kopkar AKM (-2.176007, 115.423090)',
         color: 0x8b5cf6, // Violet
-        hairColor: 0x6d28d9,
+        topColor: 0x8b5cf6,
+        pantsColor: 0x1e293b,
+        skinColor: 0xffdfc4,
+        hasGlasses: false,
+        hasHijab: true,
+        hijabColor: 0x7c3aed, // Amethyst Hijab
+        hasCap: false,
+        shoeType: 'formal',
+        shoeColor: 0x0f172a,
+        accessory: 'lanyard',
         currentActivity: 'Duduk di Meja Keuangan (Mbak Rika)',
         targetX: -8.02, targetZ: 4.4,
         curX: -8.02, curZ: 4.4,
@@ -706,7 +746,16 @@
         status: 'Belum Hadir',
         locationStr: 'Kantor Kopkar AKM (-2.176007, 115.423090)',
         color: 0x06b6d4, // Cyan / Turquoise Travel Theme
-        hairColor: 0x0e7490,
+        topColor: 0x06b6d4,
+        pantsColor: 0x334155,
+        skinColor: 0xffe4d0,
+        hasGlasses: false,
+        hasHijab: true,
+        hijabColor: 0x0e7490, // Teal Hijab
+        hasCap: false,
+        shoeType: 'formal',
+        shoeColor: 0x1e293b,
+        accessory: 'lanyard',
         currentActivity: 'Duduk di Meja Tour & Travel',
         targetX: -3.5, targetZ: 4.22,
         curX: -3.5, curZ: 4.22,
@@ -738,7 +787,17 @@
         status: 'Belum Hadir',
         locationStr: 'Store Adamart 73 (-2.176007, 115.423090)',
         color: 0xe11d48, // Red / Minimarket Uniform
+        topColor: 0xe11d48,
+        pantsColor: 0x1e293b,
+        skinColor: 0xf6c8a0,
         hairColor: 0x1e293b,
+        hasGlasses: false,
+        hasHijab: false,
+        hasCap: true,
+        capColor: 0xbe123c, // Adamart Red Pet Cap
+        shoeType: 'sneaker',
+        shoeColor: 0xffffff,
+        accessory: 'badge',
         currentActivity: 'Duduk di Kasir POS Adamart 73',
         targetX: 6.12, targetZ: -4.0,
         curX: 6.12, curZ: -4.0,
@@ -770,7 +829,16 @@
         status: 'Belum Hadir',
         locationStr: 'Store Adamart Kelanis (-2.176007, 115.423090)',
         color: 0xd97706, // Amber Gold Minimarket Uniform
-        hairColor: 0x475569, // Hijab
+        topColor: 0xd97706,
+        pantsColor: 0x1e293b,
+        skinColor: 0xffdfc4,
+        hasGlasses: false,
+        hasHijab: true,
+        hijabColor: 0x991b1b, // Maroon Retail Hijab
+        hasCap: false,
+        shoeType: 'sneaker',
+        shoeColor: 0xf1f5f9,
+        accessory: 'badge',
         currentActivity: 'Duduk di Kasir POS Adamart Kelanis',
         targetX: 6.12, targetZ: 3.5,
         curX: 6.12, curZ: 3.5,
@@ -1239,7 +1307,7 @@
       g.add(chair);
 
       scene.add(g);
-      createDeskTag('Meja Manajer Adamart (Mahmuda)', -3.5, 1.25, -5.0, 'mahmuda');
+      createDeskTag('Meja Manajer Adamart (Ibu Mahmudah)', -3.5, 1.25, -5.0, 'mahmuda');
     }
 
     /* 3. MEJA BAGIAN KEUANGAN (MBAK SRI & MBAK RIKA) */
@@ -2111,8 +2179,12 @@
 
     function applyStandingPose(mesh) {
       mesh.position.y = 0;
+      mesh.userData.leftLeg.rotation.x = 0;
+      mesh.userData.rightLeg.rotation.x = 0;
       mesh.userData.leftLeg.rotation.z = 0;
       mesh.userData.rightLeg.rotation.z = 0;
+      mesh.userData.leftArm.rotation.x = 0;
+      mesh.userData.rightArm.rotation.x = 0;
     }
 
     function spawnStaffAvatars() {
@@ -2171,65 +2243,505 @@
       });
     }
 
+    /* ==============================================================
+       PROCEDURAL 3D HUMAN CHARACTERS (AVATAR ENGINE)
+       Customized with dynamic faces, hair/hijab/cap, glasses, clothing,
+       accessories, and articulated limbs for realistic animation.
+       ============================================================== */
+
+    function generateFaceTexture(staff) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+
+      const isFemale = staff.gender === 'F';
+      const skinHex = staff.skinColor ? ('#' + staff.skinColor.toString(16).padStart(6, '0')) : '#ffd1a4';
+      
+      // Skin base
+      ctx.fillStyle = skinHex;
+      ctx.fillRect(0, 0, 256, 256);
+
+      // Soft rosy cheeks
+      ctx.save();
+      ctx.fillStyle = isFemale ? 'rgba(244, 114, 182, 0.28)' : 'rgba(239, 68, 68, 0.14)';
+      ctx.beginPath();
+      ctx.arc(68, 160, 26, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(188, 160, 26, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Eyebrows
+      ctx.strokeStyle = isFemale ? '#451a03' : '#1e293b';
+      ctx.lineWidth = isFemale ? 4 : 5.5;
+      ctx.lineCap = 'round';
+
+      // Left eyebrow
+      ctx.beginPath();
+      if (isFemale) {
+        ctx.moveTo(60, 96);
+        ctx.quadraticCurveTo(80, 86, 102, 93);
+      } else {
+        ctx.moveTo(60, 98);
+        ctx.lineTo(102, 94);
+      }
+      ctx.stroke();
+
+      // Right eyebrow
+      ctx.beginPath();
+      if (isFemale) {
+        ctx.moveTo(154, 93);
+        ctx.quadraticCurveTo(176, 86, 196, 96);
+      } else {
+        ctx.moveTo(154, 94);
+        ctx.lineTo(196, 98);
+      }
+      ctx.stroke();
+
+      // Eye Whites (Sclera)
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(82, 126, 18, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(174, 126, 18, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Irises (Deep warm espresso / midnight blue)
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(82, 126, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(174, 126, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eye Catchlights (Lively white reflection dots)
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(85, 123, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(80, 128, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(177, 123, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(172, 128, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Upper eyelid contour
+      ctx.strokeStyle = '#090d16';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(82, 126, 18, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(174, 126, 18, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.stroke();
+
+      // Female eyelashes
+      if (isFemale) {
+        ctx.strokeStyle = '#090d16';
+        ctx.lineWidth = 2.5;
+        // Left eye lashes
+        ctx.beginPath();
+        ctx.moveTo(98, 117);
+        ctx.lineTo(105, 110);
+        ctx.moveTo(66, 117);
+        ctx.lineTo(59, 110);
+        ctx.stroke();
+        // Right eye lashes
+        ctx.beginPath();
+        ctx.moveTo(158, 117);
+        ctx.lineTo(151, 110);
+        ctx.moveTo(190, 117);
+        ctx.lineTo(197, 110);
+        ctx.stroke();
+      }
+
+      // Nose bridge and contour
+      ctx.strokeStyle = isFemale ? 'rgba(180, 83, 9, 0.45)' : 'rgba(71, 85, 105, 0.55)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(128, 136);
+      ctx.lineTo(128, 154);
+      ctx.lineTo(133, 155);
+      ctx.stroke();
+
+      // Friendly Smile / Mouth
+      ctx.strokeStyle = isFemale ? '#be123c' : '#991b1b';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.arc(128, 182, 16, Math.PI * 0.15, Math.PI * 0.85);
+      ctx.stroke();
+
+      // Feminine soft lip tone
+      if (isFemale) {
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath();
+        ctx.ellipse(128, 196, 9, 3.5, 0, 0, Math.PI);
+        ctx.fill();
+      }
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.generateMipmaps = false;
+      texture.minFilter = THREE.LinearFilter;
+      return texture;
+    }
+
+    function createGlassesMesh(frameColor, style) {
+      const g = new THREE.Group();
+      const frameMat = new THREE.MeshStandardMaterial({ color: frameColor, roughness: 0.25, metalness: 0.85 });
+      const lensMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.38, roughness: 0.1 });
+
+      if (style === 'round') {
+        // Ibu Mahmudah - Elegant Round Frame
+        const r = 0.046;
+        const tube = 0.007;
+        const leftRim = new THREE.Mesh(new THREE.TorusGeometry(r, tube, 8, 24), frameMat);
+        leftRim.position.set(-0.065, 0, 0);
+        g.add(leftRim);
+
+        const leftLens = new THREE.Mesh(new THREE.CircleGeometry(r - 0.002, 16), lensMat);
+        leftLens.position.set(-0.065, 0, 0);
+        g.add(leftLens);
+
+        const rightRim = new THREE.Mesh(new THREE.TorusGeometry(r, tube, 8, 24), frameMat);
+        rightRim.position.set(0.065, 0, 0);
+        g.add(rightRim);
+
+        const rightLens = new THREE.Mesh(new THREE.CircleGeometry(r - 0.002, 16), lensMat);
+        rightLens.position.set(0.065, 0, 0);
+        g.add(rightLens);
+
+        const bridge = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.038, 8), frameMat);
+        bridge.rotation.z = Math.PI / 2;
+        bridge.position.set(0, 0.015, 0);
+        g.add(bridge);
+
+        const templeGeo = new THREE.BoxGeometry(0.008, 0.008, 0.17);
+        const leftTemple = new THREE.Mesh(templeGeo, frameMat);
+        leftTemple.position.set(-0.115, 0.005, -0.08);
+        g.add(leftTemple);
+
+        const rightTemple = new THREE.Mesh(templeGeo, frameMat);
+        rightTemple.position.set(0.115, 0.005, -0.08);
+        g.add(rightTemple);
+      } else {
+        // Pak Fedrik - Modern Square Executive Frame
+        const w = 0.088, h = 0.062, d = 0.014;
+        const leftRim = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
+        leftRim.position.set(-0.065, 0, 0);
+        g.add(leftRim);
+        const leftLens = new THREE.Mesh(new THREE.BoxGeometry(w - 0.018, h - 0.018, d + 0.002), lensMat);
+        leftLens.position.set(-0.065, 0, 0);
+        g.add(leftLens);
+
+        const rightRim = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
+        rightRim.position.set(0.065, 0, 0);
+        g.add(rightRim);
+        const rightLens = new THREE.Mesh(new THREE.BoxGeometry(w - 0.018, h - 0.018, d + 0.002), lensMat);
+        rightLens.position.set(0.065, 0, 0);
+        g.add(rightLens);
+
+        const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.012, d), frameMat);
+        bridge.position.set(0, 0.012, 0);
+        g.add(bridge);
+
+        const templeGeo = new THREE.BoxGeometry(0.01, 0.01, 0.17);
+        const leftTemple = new THREE.Mesh(templeGeo, frameMat);
+        leftTemple.position.set(-0.115, 0.005, -0.08);
+        g.add(leftTemple);
+
+        const rightTemple = new THREE.Mesh(templeGeo, frameMat);
+        rightTemple.position.set(0.115, 0.005, -0.08);
+        g.add(rightTemple);
+      }
+      return g;
+    }
+
     function buildCharacterMesh(staff) {
       const charGroup = new THREE.Group();
       charGroup.userData = { staff };
 
-      const skinMat = new THREE.MeshStandardMaterial({ color: 0xffd1a4, roughness: 0.6 });
-      const clothesMat = new THREE.MeshStandardMaterial({ color: staff.color, roughness: 0.5 });
-      const pantsMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
-      const hairMat = new THREE.MeshStandardMaterial({ color: staff.hairColor, roughness: 0.4 });
+      const skinMat = new THREE.MeshStandardMaterial({
+        color: staff.skinColor || 0xffd1a4,
+        roughness: 0.6
+      });
+      const topColor = staff.topColor || staff.color;
+      const clothesMat = new THREE.MeshStandardMaterial({ color: topColor, roughness: 0.5 });
+      const pantsMat = new THREE.MeshStandardMaterial({ color: staff.pantsColor || 0x1e293b, roughness: 0.6 });
 
+      // 1. TORSO BODY
       const torso = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.55, 0.28), clothesMat);
       torso.position.y = 0.95;
       torso.castShadow = true;
       charGroup.add(torso);
 
-      const head = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.36, 0.32), skinMat);
+      // Torso Accessories & Clothing Details
+      if (staff.accessory === 'tie') {
+        // Pak Fedrik: Collared shirt & Silk Executive Tie
+        const collar = new THREE.Mesh(
+          new THREE.BoxGeometry(0.20, 0.14, 0.03),
+          new THREE.MeshStandardMaterial({ color: 0xffffff })
+        );
+        collar.position.set(0, 1.16, 0.135);
+        charGroup.add(collar);
+
+        const tieMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.3 }); // Crimson Silk Tie
+        const tie = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.34, 0.025), tieMat);
+        tie.position.set(0, 0.98, 0.15);
+        charGroup.add(tie);
+
+        const tieClip = new THREE.Mesh(
+          new THREE.BoxGeometry(0.06, 0.015, 0.03),
+          new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9 })
+        );
+        tieClip.position.set(0, 1.02, 0.155);
+        charGroup.add(tieClip);
+
+      } else if (staff.accessory === 'badge') {
+        // Retail Cashier Name Badge (Sahap & Azimah)
+        const badgeMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
+        const badge = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.05, 0.02), badgeMat);
+        badge.position.set(-0.13, 1.05, 0.145);
+        charGroup.add(badge);
+
+        const badgeBar = new THREE.Mesh(
+          new THREE.BoxGeometry(0.09, 0.015, 0.025),
+          new THREE.MeshStandardMaterial({ color: 0x0f172a })
+        );
+        badgeBar.position.set(-0.13, 1.05, 0.15);
+        charGroup.add(badgeBar);
+
+      } else if (staff.accessory === 'lanyard') {
+        // Office Staff ID Lanyard & Badge Card
+        const ribbonMat = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.4 });
+        const leftStrap = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.22, 0.01), ribbonMat);
+        leftStrap.position.set(-0.06, 1.08, 0.145);
+        leftStrap.rotation.z = -0.22;
+        charGroup.add(leftStrap);
+
+        const rightStrap = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.22, 0.01), ribbonMat);
+        rightStrap.position.set(0.06, 1.08, 0.145);
+        rightStrap.rotation.z = 0.22;
+        charGroup.add(rightStrap);
+
+        const idCard = new THREE.Mesh(
+          new THREE.BoxGeometry(0.09, 0.12, 0.02),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })
+        );
+        idCard.position.set(0, 0.95, 0.15);
+        charGroup.add(idCard);
+
+        const photoSquare = new THREE.Mesh(
+          new THREE.BoxGeometry(0.05, 0.05, 0.025),
+          new THREE.MeshStandardMaterial({ color: 0x3b82f6 })
+        );
+        photoSquare.position.set(0, 0.97, 0.155);
+        charGroup.add(photoSquare);
+      }
+
+      // 2. HEAD WITH PROCEDURAL EXPRESSIVE FACE
+      const faceTexture = generateFaceTexture(staff);
+      const faceMat = new THREE.MeshStandardMaterial({ map: faceTexture, roughness: 0.55 });
+      const headMaterials = [skinMat, skinMat, skinMat, skinMat, faceMat, skinMat];
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.36, 0.32), headMaterials);
       head.position.y = 1.45;
       head.castShadow = true;
       charGroup.add(head);
 
-      // Hair or Hijab Styling
-      if (staff.gender === 'F') {
-        const hijabColor = staff.hairColor || staff.color;
-        const hijabMat = new THREE.MeshStandardMaterial({ color: hijabColor, roughness: 0.5 });
-        
-        // Hijab Cap / Wrap covering head
-        const hijabWrap = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.40, 0.36), hijabMat);
-        hijabWrap.position.set(0, 1.48, -0.02);
-        charGroup.add(hijabWrap);
+      // 3. HAIR / HIJAB / CAP HEADWEAR
+      if (staff.hasHijab || staff.gender === 'F') {
+        // Elegant Multi-layer Indonesian Hijab
+        const hijabColor = staff.hijabColor || staff.hairColor || staff.color;
+        const hijabMat = new THREE.MeshStandardMaterial({ color: hijabColor, roughness: 0.65 });
 
-        // Hijab Scarf Drape over collar/chest
-        const hijabDrape = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.32, 0.16), hijabMat);
-        hijabDrape.position.set(0, 1.15, 0.12);
-        charGroup.add(hijabDrape);
+        // Outer Hood covering top and back of head
+        const hijabHood = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.40, 0.36), hijabMat);
+        hijabHood.position.set(0, 1.48, -0.03);
+        charGroup.add(hijabHood);
+
+        // Forehead Band (Inner Ciput framing upper face)
+        const foreheadBand = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.06, 0.04), hijabMat);
+        foreheadBand.position.set(0, 1.58, 0.15);
+        charGroup.add(foreheadBand);
+
+        // Side Drapery framing cheeks
+        const leftWrap = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.34, 0.12), hijabMat);
+        leftWrap.position.set(-0.17, 1.44, 0.11);
+        charGroup.add(leftWrap);
+
+        const rightWrap = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.34, 0.12), hijabMat);
+        rightWrap.position.set(0.17, 1.44, 0.11);
+        charGroup.add(rightWrap);
+
+        // Under-chin wrap
+        const chinWrap = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.07, 0.10), hijabMat);
+        chinWrap.position.set(0, 1.28, 0.13);
+        charGroup.add(chinWrap);
+
+        // Flowing Shoulder & Chest Drape (Pashmina / Khimar)
+        const chestDrape = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.28, 0.16), hijabMat);
+        chestDrape.position.set(0, 1.12, 0.11);
+        charGroup.add(chestDrape);
+
+      } else if (staff.hasCap) {
+        // Muhammad Sahap: Adamart Retail Pet Cap with curved visor
+        const capColor = staff.capColor || 0xbe123c;
+        const capMat = new THREE.MeshStandardMaterial({ color: capColor, roughness: 0.5 });
+        const capTrimMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+
+        // Cap Crown
+        const capCrown = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.14, 0.35), capMat);
+        capCrown.position.set(0, 1.63, -0.01);
+        charGroup.add(capCrown);
+
+        // Forward Visor / Brim
+        const visor = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.03, 0.16), capMat);
+        visor.position.set(0, 1.57, 0.21);
+        visor.rotation.x = 0.15;
+        charGroup.add(visor);
+
+        // White accent trim band
+        const visorTrim = new THREE.Mesh(new THREE.BoxGeometry(0.345, 0.015, 0.02), capTrimMat);
+        visorTrim.position.set(0, 1.58, 0.175);
+        charGroup.add(visorTrim);
+
+        // Neat hair peeking from underneath at back & sides
+        const hairMat = new THREE.MeshStandardMaterial({ color: staff.hairColor || 0x1e293b, roughness: 0.4 });
+        const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.12, 0.12), hairMat);
+        hairBack.position.set(0, 1.48, -0.12);
+        charGroup.add(hairBack);
+
       } else {
-        const hair = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.16, 0.34), hairMat);
-        hair.position.y = 1.62;
-        charGroup.add(hair);
+        // Pak Fedrik: Neat Executive Parted Hairstyle
+        const hairMat = new THREE.MeshStandardMaterial({ color: staff.hairColor || 0x18181b, roughness: 0.4 });
+        const hairTop = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.14, 0.35), hairMat);
+        hairTop.position.set(0, 1.62, -0.01);
+        charGroup.add(hairTop);
+
+        const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.365, 0.22, 0.16), hairMat);
+        hairBack.position.set(0, 1.48, -0.10);
+        charGroup.add(hairBack);
+
+        const leftSideburn = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.14, 0.08), hairMat);
+        leftSideburn.position.set(-0.175, 1.47, 0.06);
+        charGroup.add(leftSideburn);
+
+        const rightSideburn = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.14, 0.08), hairMat);
+        rightSideburn.position.set(0.175, 1.47, 0.06);
+        charGroup.add(rightSideburn);
       }
 
-      const armGeo = new THREE.BoxGeometry(0.14, 0.5, 0.14);
-      armGeo.translate(0, -0.2, 0);
+      // 4. 3D GLASSES (Pak Fedrik & Ibu Mahmudah)
+      if (staff.hasGlasses) {
+        const glasses = createGlassesMesh(staff.glassesColor || 0x1e293b, staff.glassesStyle || 'square');
+        glasses.position.set(0, 1.47, 0.165);
+        charGroup.add(glasses);
+      }
 
-      const leftArm = new THREE.Mesh(armGeo, clothesMat);
+      // 5. ARTICULATED ARMS (Sleeve + Bare Wrist/Hand + Wristwatch)
+      const leftArm = new THREE.Group();
       leftArm.position.set(-0.32, 1.15, 0);
+
+      const leftSleeveGeo = new THREE.BoxGeometry(0.14, 0.36, 0.14);
+      leftSleeveGeo.translate(0, -0.18, 0);
+      const leftSleeve = new THREE.Mesh(leftSleeveGeo, clothesMat);
+      leftSleeve.castShadow = true;
+      leftArm.add(leftSleeve);
+
+      const leftHandGeo = new THREE.BoxGeometry(0.11, 0.14, 0.11);
+      leftHandGeo.translate(0, -0.43, 0);
+      const leftHand = new THREE.Mesh(leftHandGeo, skinMat);
+      leftHand.castShadow = true;
+      leftArm.add(leftHand);
+
+      // Wristwatch on left arm
+      const watchGeo = new THREE.BoxGeometry(0.13, 0.035, 0.13);
+      watchGeo.translate(0, -0.36, 0);
+      const watch = new THREE.Mesh(
+        watchGeo,
+        new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.85, roughness: 0.2 })
+      );
+      leftArm.add(watch);
       charGroup.add(leftArm);
 
-      const rightArm = new THREE.Mesh(armGeo, clothesMat);
+      const rightArm = new THREE.Group();
       rightArm.position.set(0.32, 1.15, 0);
+
+      const rightSleeveGeo = new THREE.BoxGeometry(0.14, 0.36, 0.14);
+      rightSleeveGeo.translate(0, -0.18, 0);
+      const rightSleeve = new THREE.Mesh(rightSleeveGeo, clothesMat);
+      rightSleeve.castShadow = true;
+      rightArm.add(rightSleeve);
+
+      const rightHandGeo = new THREE.BoxGeometry(0.11, 0.14, 0.11);
+      rightHandGeo.translate(0, -0.43, 0);
+      const rightHand = new THREE.Mesh(rightHandGeo, skinMat);
+      rightHand.castShadow = true;
+      rightArm.add(rightHand);
       charGroup.add(rightArm);
 
-      const legGeo = new THREE.BoxGeometry(0.18, 0.6, 0.18);
-      legGeo.translate(0, -0.28, 0);
+      // 6. ARTICULATED LEGS (Trousers + Shoes / Sneakers)
+      function buildLeg(xPos) {
+        const legGroup = new THREE.Group();
+        legGroup.position.set(xPos, 0.68, 0);
 
-      const leftLeg = new THREE.Mesh(legGeo, pantsMat);
-      leftLeg.position.set(-0.14, 0.68, 0);
+        const pantsGeo = new THREE.BoxGeometry(0.18, 0.44, 0.18);
+        pantsGeo.translate(0, -0.22, 0);
+        const pantsMesh = new THREE.Mesh(pantsGeo, pantsMat);
+        pantsMesh.castShadow = true;
+        legGroup.add(pantsMesh);
+
+        if (staff.shoeType === 'sneaker') {
+          // Modern Retail Sneakers (Muhammad Sahap & Azimah)
+          const sneakerMat = new THREE.MeshStandardMaterial({ color: staff.topColor || staff.color, roughness: 0.5 });
+          const whiteSoleMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
+
+          const upperGeo = new THREE.BoxGeometry(0.19, 0.10, 0.25);
+          upperGeo.translate(0, -0.48, 0.035);
+          const upper = new THREE.Mesh(upperGeo, sneakerMat);
+          upper.castShadow = true;
+          legGroup.add(upper);
+
+          const soleGeo = new THREE.BoxGeometry(0.20, 0.045, 0.27);
+          soleGeo.translate(0, -0.54, 0.035);
+          const sole = new THREE.Mesh(soleGeo, whiteSoleMat);
+          sole.castShadow = true;
+          legGroup.add(sole);
+
+        } else {
+          // Office Formal Leather Dress Shoes (Fedrik, Mahmudah, Sri, Rika, Zahrah)
+          const shoeColor = staff.shoeColor || 0x111827;
+          const leatherMat = new THREE.MeshStandardMaterial({ color: shoeColor, roughness: 0.25, metalness: 0.3 });
+          const soleBaseMat = new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 0.8 });
+
+          const upperGeo = new THREE.BoxGeometry(0.19, 0.10, 0.25);
+          upperGeo.translate(0, -0.48, 0.035);
+          const upper = new THREE.Mesh(upperGeo, leatherMat);
+          upper.castShadow = true;
+          legGroup.add(upper);
+
+          const soleGeo = new THREE.BoxGeometry(0.20, 0.03, 0.26);
+          soleGeo.translate(0, -0.54, 0.035);
+          const sole = new THREE.Mesh(soleGeo, soleBaseMat);
+          sole.castShadow = true;
+          legGroup.add(sole);
+        }
+
+        return legGroup;
+      }
+
+      const leftLeg = buildLeg(-0.14);
       charGroup.add(leftLeg);
 
-      const rightLeg = new THREE.Mesh(legGeo, pantsMat);
-      rightLeg.position.set(0.14, 0.68, 0);
+      const rightLeg = buildLeg(0.14);
       charGroup.add(rightLeg);
 
       charGroup.userData.leftArm = leftArm;
