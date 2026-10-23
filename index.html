@@ -1515,6 +1515,16 @@
         onClick
       };
       plateMesh.userData = group.userData;
+      baseMesh.userData = group.userData;
+      trimMesh.userData = group.userData;
+
+      // Invisible Touch Hit-Box (Memperbesar area sentuh untuk layar HP / ponsel)
+      const hitBoxGeo = new THREE.BoxGeometry(width + 0.45, height + 0.35, depth + 0.45);
+      const hitBoxMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
+      const hitBox = new THREE.Mesh(hitBoxGeo, hitBoxMat);
+      hitBox.position.set(0, 0.024 + height * 0.44, 0);
+      hitBox.userData = group.userData;
+      group.add(hitBox);
 
       INTERACTIVE_NAMEPLATES.push(group);
       return group;
@@ -2284,6 +2294,9 @@
       frame.castShadow = true;
       scene.add(frame);
 
+      frame.userData.isSignboard = true;
+      INTERACTIVE_GALLERY_MESHES.push(frame);
+
       // Gold inner trim bezel
       const signGoldTrim = new THREE.Mesh(
         new THREE.BoxGeometry(3.45, 2.05, 0.09),
@@ -2291,6 +2304,8 @@
       );
       signGoldTrim.position.set(-12.25, 3.5, 2.3);
       signGoldTrim.rotation.y = Math.PI / 2;
+      signGoldTrim.userData.isSignboard = true;
+      INTERACTIVE_GALLERY_MESHES.push(signGoldTrim);
       scene.add(signGoldTrim);
 
       const signMat = new THREE.MeshStandardMaterial({ 
@@ -2324,6 +2339,8 @@
       );
       plaqueSign.position.set(-12.21, 2.32, 2.3);
       plaqueSign.rotation.y = Math.PI / 2;
+      plaqueSign.userData.isSignboard = true;
+      INTERACTIVE_GALLERY_MESHES.push(plaqueSign);
       scene.add(plaqueSign);
 
       // ===================================================================
@@ -2341,6 +2358,8 @@
       // Frame Luar Obsidian Titanium Tebal (Ukuran Simetris dengan Plang)
       const awardsFrame = new THREE.Mesh(new THREE.BoxGeometry(3.55, 2.15, 0.08), frameMat);
       awardsFrame.castShadow = true;
+      awardsFrame.userData.isAwards = true;
+      INTERACTIVE_GALLERY_MESHES.push(awardsFrame);
       awardsGroup.add(awardsFrame);
 
       // Inner Gold Trim Bezel
@@ -2348,6 +2367,8 @@
         new THREE.BoxGeometry(3.45, 2.05, 0.09),
         new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.88, roughness: 0.2 })
       );
+      awardsGoldTrim.userData.isAwards = true;
+      INTERACTIVE_GALLERY_MESHES.push(awardsGoldTrim);
       awardsGroup.add(awardsGoldTrim);
 
       // Permukaan Bidang Galeri Penghargaan (Tekstur Piagam HD)
@@ -2368,6 +2389,8 @@
         new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9, roughness: 0.2 })
       );
       awardsPlaque.position.set(0, -1.18, 0.05);
+      awardsPlaque.userData.isAwards = true;
+      INTERACTIVE_GALLERY_MESHES.push(awardsPlaque);
       awardsGroup.add(awardsPlaque);
 
       // Lampu Sorot Khusus Galeri Penghargaan (Downlight Ceiling Spotlights)
@@ -2401,6 +2424,8 @@
         new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2, metalness: 0.6 })
       );
       disc.rotation.x = Math.PI / 2;
+      disc.userData.isLogo = true;
+      INTERACTIVE_GALLERY_MESHES.push(disc);
       emblemGroup.add(disc);
 
       // Ring Emas Mewah
@@ -2408,6 +2433,8 @@
         new THREE.TorusGeometry(0.89, 0.035, 16, 48),
         new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9, roughness: 0.2 })
       );
+      ring.userData.isLogo = true;
+      INTERACTIVE_GALLERY_MESHES.push(ring);
       emblemGroup.add(ring);
 
       // Muka Emblem Logo Bulat Koperasi
@@ -2483,12 +2510,16 @@
       const outerFrameMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35, metalness: 0.6 });
       const outerFrame = new THREE.Mesh(outerFrameGeo, outerFrameMat);
       outerFrame.castShadow = true;
+      outerFrame.userData.photoType = 'pengurus';
+      INTERACTIVE_GALLERY_MESHES.push(outerFrame);
       pengurusGroup.add(outerFrame);
 
       // Inner Gold Trim / Chamfer Bezel Mewah
       const goldTrimGeo = new THREE.BoxGeometry(4.88, 2.78, 0.13);
       const goldTrimMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.25, metalness: 0.85 });
       const goldTrim = new THREE.Mesh(goldTrimGeo, goldTrimMat);
+      goldTrim.userData.photoType = 'pengurus';
+      INTERACTIVE_GALLERY_MESHES.push(goldTrim);
       pengurusGroup.add(goldTrim);
 
       // Kanvas / Bidang Foto Pengurus
@@ -2508,6 +2539,8 @@
       const plaqueMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9, roughness: 0.2 });
       const plaque = new THREE.Mesh(plaqueGeo, plaqueMat);
       plaque.position.set(0, -1.52, 0.07);
+      plaque.userData.photoType = 'pengurus';
+      INTERACTIVE_GALLERY_MESHES.push(plaque);
       pengurusGroup.add(plaque);
 
       // Lampu Sorot Galeri (Spotlight dari plafon ke arah foto pengurus)
@@ -2543,9 +2576,13 @@
       const framePengelolaGeo = new THREE.BoxGeometry(3.38, 2.22, 0.10);
       const framePengelola = new THREE.Mesh(framePengelolaGeo, outerFrameMat);
       framePengelola.castShadow = true;
+      framePengelola.userData.photoType = 'pengelola';
+      INTERACTIVE_GALLERY_MESHES.push(framePengelola);
       pengelolaGroup.add(framePengelola);
 
       const goldTrimPengelola = new THREE.Mesh(new THREE.BoxGeometry(3.26, 2.10, 0.11), goldTrimMat);
+      goldTrimPengelola.userData.photoType = 'pengelola';
+      INTERACTIVE_GALLERY_MESHES.push(goldTrimPengelola);
       pengelolaGroup.add(goldTrimPengelola);
 
       // Kanvas / Bidang Foto Pengelola
@@ -2563,6 +2600,8 @@
       // Plakat Label di Bawah Frame
       const plaquePengelola = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.11, 0.02), plaqueMat);
       plaquePengelola.position.set(0, -1.18, 0.06);
+      plaquePengelola.userData.photoType = 'pengelola';
+      INTERACTIVE_GALLERY_MESHES.push(plaquePengelola);
       pengelolaGroup.add(plaquePengelola);
 
       // Lampu Sorot Galeri (Spotlight dari plafon ke arah foto pengelola)
@@ -3607,14 +3646,91 @@
     }
 
     /* =====================================================================
-       6. INTERACTIVITY & SELECTION
+       6. INTERACTIVITY & SELECTION (DESKTOP & MOBILE TOUCH OPTIMIZED)
        ===================================================================== */
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
+    let lastActionTime = 0;
+
+    // Pointer gesture trackers for mobile touch screens
+    let pointerStartX = 0;
+    let pointerStartY = 0;
+    let pointerStartTime = 0;
+    let isPointerMoving = false;
 
     function setupRaycasting() {
-      window.addEventListener('click', onPointerClick);
-      window.addEventListener('pointermove', onPointerHover);
+      const canvasEl = renderer.domElement;
+
+      // 1. POINTER EVENTS (Modern mobile browsers & stylus/mouse)
+      canvasEl.addEventListener('pointerdown', (e) => {
+        if (e.button !== undefined && e.button !== 0) return;
+        pointerStartX = e.clientX;
+        pointerStartY = e.clientY;
+        pointerStartTime = performance.now();
+        isPointerMoving = false;
+      }, { passive: true });
+
+      canvasEl.addEventListener('pointermove', (e) => {
+        const dx = e.clientX - pointerStartX;
+        const dy = e.clientY - pointerStartY;
+        if (Math.hypot(dx, dy) > 12) {
+          isPointerMoving = true;
+        }
+      }, { passive: true });
+
+      canvasEl.addEventListener('pointerup', (e) => {
+        if (e.button !== undefined && e.button !== 0) return;
+        const duration = performance.now() - pointerStartTime;
+        const dist = Math.hypot(e.clientX - pointerStartX, e.clientY - pointerStartY);
+        // If movement <= 15px and duration < 500ms, it is a clean tap!
+        if (!isPointerMoving && dist <= 15 && duration < 500) {
+          handlePointerAction(e.clientX, e.clientY, e.target);
+        }
+      }, { passive: true });
+
+      // 2. TOUCH EVENTS (Safari iOS & WebKit fallback)
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchStartTime = 0;
+      let isTouchMoving = false;
+
+      canvasEl.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches.length === 1) {
+          const t = e.touches[0];
+          touchStartX = t.clientX;
+          touchStartY = t.clientY;
+          touchStartTime = performance.now();
+          isTouchMoving = false;
+        }
+      }, { passive: true });
+
+      canvasEl.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches.length === 1) {
+          const t = e.touches[0];
+          if (Math.hypot(t.clientX - touchStartX, t.clientY - touchStartY) > 12) {
+            isTouchMoving = true;
+          }
+        }
+      }, { passive: true });
+
+      canvasEl.addEventListener('touchend', (e) => {
+        if (e.changedTouches && e.changedTouches.length > 0) {
+          const t = e.changedTouches[0];
+          const duration = performance.now() - touchStartTime;
+          const dist = Math.hypot(t.clientX - touchStartX, t.clientY - touchStartY);
+          if (!isTouchMoving && dist <= 15 && duration < 500) {
+            handlePointerAction(t.clientX, t.clientY, e.target);
+          }
+        }
+      }, { passive: true });
+
+      // 3. DESKTOP CLICK EVENT (Standard fallback)
+      window.addEventListener('click', (e) => {
+        handlePointerAction(e.clientX, e.clientY, e.target);
+      });
+
+      // 4. DESKTOP HOVER CURSOR
+      window.addEventListener('pointermove', onPointerHover, { passive: true });
     }
 
     function onPointerHover(event) {
@@ -3622,8 +3738,9 @@
         document.body.style.cursor = 'default';
         return;
       }
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
 
@@ -3637,85 +3754,125 @@
       document.body.style.cursor = hits.length > 0 ? 'pointer' : 'default';
     }
 
-    function onPointerClick(event) {
-      if (event.target.closest('#detail-card') || event.target.closest('header') || event.target.closest('footer') || event.target.closest('.glass-panel')) {
+    function handlePointerAction(clientX, clientY, targetEl) {
+      // Debounce multiple rapid events (e.g. pointerup followed by click)
+      const now = performance.now();
+      if (now - lastActionTime < 350) return;
+      lastActionTime = now;
+
+      // Ignore if clicking on UI overlays (Header, Footer, Open Modals, Drawer)
+      if (targetEl && (
+          targetEl.closest('#detail-card') || 
+          targetEl.closest('header') || 
+          targetEl.closest('footer') || 
+          targetEl.closest('.glass-panel') ||
+          targetEl.closest('#modal-signboard') ||
+          targetEl.closest('#modal-awards') ||
+          targetEl.closest('#modal-photo-viewer') ||
+          targetEl.closest('#modal-stats') ||
+          targetEl.closest('#modal-directory')
+      )) {
         return;
       }
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-      raycaster.setFromCamera(mouse, camera);
+      // Calculate exact canvas-relative Normalized Device Coordinates (NDC)
+      const rect = renderer.domElement.getBoundingClientRect();
+      const ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
+      const ndcY = -((clientY - rect.top) / rect.height) * 2 + 1;
 
-      // 1. Check interactive 3D desk nameplates (Papan Nama Meja 3D)
-      if (typeof INTERACTIVE_NAMEPLATES !== 'undefined' && INTERACTIVE_NAMEPLATES.length > 0) {
-        const npIntersects = raycaster.intersectObjects(INTERACTIVE_NAMEPLATES, true);
-        if (npIntersects.length > 0) {
-          let obj = npIntersects[0].object;
-          while (obj && !obj.userData.isNameplate) {
-            obj = obj.parent;
-          }
-          if (obj && obj.userData) {
-            if (obj.userData.assignedStaffId) {
-              const staff = STAFF_ROSTER.find(s => s.id === obj.userData.assignedStaffId);
-              if (staff) selectStaff(staff);
+      // Helper function to raycast with given NDC
+      function tryRaycast(x, y) {
+        mouse.x = x;
+        mouse.y = y;
+        raycaster.setFromCamera(mouse, camera);
+
+        // 1. Check interactive 3D desk nameplates (Papan Nama Meja 3D)
+        if (typeof INTERACTIVE_NAMEPLATES !== 'undefined' && INTERACTIVE_NAMEPLATES.length > 0) {
+          const npIntersects = raycaster.intersectObjects(INTERACTIVE_NAMEPLATES, true);
+          if (npIntersects.length > 0) {
+            let obj = npIntersects[0].object;
+            while (obj && !obj.userData.isNameplate) {
+              obj = obj.parent;
             }
-            if (typeof obj.userData.onClick === 'function') {
-              obj.userData.onClick();
+            if (obj && obj.userData) {
+              if (obj.userData.assignedStaffId) {
+                const staff = STAFF_ROSTER.find(s => s.id === obj.userData.assignedStaffId);
+                if (staff) selectStaff(staff);
+              }
+              if (typeof obj.userData.onClick === 'function') {
+                obj.userData.onClick();
+              }
+              if (obj.userData.targetFocus) {
+                const tf = obj.userData.targetFocus;
+                gsap.to(controls.target, { x: tf.x, y: 1.0, z: tf.z, duration: 1.2, ease: 'power2.inOut' });
+                gsap.to(camera.position, { x: tf.x - 4.2, y: tf.y + 3.5, z: tf.z + 5.2, duration: 1.2, ease: 'power2.inOut' });
+              }
+              return true;
             }
-            if (obj.userData.targetFocus) {
-              const tf = obj.userData.targetFocus;
-              gsap.to(controls.target, { x: tf.x, y: 1.0, z: tf.z, duration: 1.2, ease: 'power2.inOut' });
-              gsap.to(camera.position, { x: tf.x - 4.2, y: tf.y + 3.5, z: tf.z + 5.2, duration: 1.2, ease: 'power2.inOut' });
-            }
-            return;
           }
         }
+
+        // 2. Check interactive gallery photos & wall elements
+        if (typeof INTERACTIVE_GALLERY_MESHES !== 'undefined' && INTERACTIVE_GALLERY_MESHES.length > 0) {
+          const galleryIntersects = raycaster.intersectObjects(INTERACTIVE_GALLERY_MESHES, true);
+          if (galleryIntersects.length > 0) {
+            let obj = galleryIntersects[0].object;
+            while (obj && !obj.userData.photoType && !obj.userData.isSignboard && !obj.userData.isLogo && !obj.userData.isAwards) {
+              obj = obj.parent;
+            }
+            if (obj && obj.userData) {
+              if (obj.userData.isAwards) {
+                focusPreset('penghargaan');
+                openAwardsModal();
+                return true;
+              }
+              if (obj.userData.isSignboard) {
+                focusPreset('logo');
+                openSignboardModal();
+                return true;
+              }
+              if (obj.userData.isLogo) {
+                focusPreset('emblem');
+                return true;
+              }
+              if (obj.userData.photoType) {
+                focusPreset(obj.userData.photoType === 'pengurus' ? 'foto-pengurus' : 'foto-pengelola');
+                openPhotoModal(obj.userData.photoType);
+                return true;
+              }
+            }
+          }
+        }
+
+        // 3. Check interactive staff avatar meshes
+        const interactiveStaffMeshes = STAFF_ROSTER.filter(s => (s.status === 'Hadir' || s.status === 'Sudah Pulang') && s.mesh && s.mesh.visible).map(s => s.mesh);
+        const intersects = raycaster.intersectObjects(interactiveStaffMeshes, true);
+        if (intersects.length > 0) {
+          let root = intersects[0].object;
+          while (root.parent && !root.userData.staff) {
+            root = root.parent;
+          }
+          if (root.userData && root.userData.staff) {
+            selectStaff(root.userData.staff);
+            return true;
+          }
+        }
+
+        return false;
       }
 
-      // 2. Check interactive gallery photos & wall elements
-      if (typeof INTERACTIVE_GALLERY_MESHES !== 'undefined' && INTERACTIVE_GALLERY_MESHES.length > 0) {
-        const galleryIntersects = raycaster.intersectObjects(INTERACTIVE_GALLERY_MESHES, true);
-        if (galleryIntersects.length > 0) {
-          let obj = galleryIntersects[0].object;
-          while (obj && !obj.userData.photoType && !obj.userData.isSignboard && !obj.userData.isLogo && !obj.userData.isAwards) {
-            obj = obj.parent;
-          }
-          if (obj && obj.userData) {
-            if (obj.userData.isAwards) {
-              focusPreset('penghargaan');
-              openAwardsModal();
-              return;
-            }
-            if (obj.userData.isSignboard) {
-              focusPreset('logo');
-              openSignboardModal();
-              return;
-            }
-            if (obj.userData.isLogo) {
-              focusPreset('emblem');
-              return;
-            }
-            if (obj.userData.photoType) {
-              focusPreset(obj.userData.photoType === 'pengurus' ? 'foto-pengurus' : 'foto-pengelola');
-              openPhotoModal(obj.userData.photoType);
-              return;
-            }
-          }
-        }
-      }
+      // Try exact tap coordinate first
+      if (tryRaycast(ndcX, ndcY)) return;
 
-      // 3. Check interactive staff avatar meshes
-      const interactiveStaffMeshes = STAFF_ROSTER.filter(s => (s.status === 'Hadir' || s.status === 'Sudah Pulang') && s.mesh && s.mesh.visible).map(s => s.mesh);
-      const intersects = raycaster.intersectObjects(interactiveStaffMeshes, true);
-
-      if (intersects.length > 0) {
-        let root = intersects[0].object;
-        while (root.parent && !root.userData.staff) {
-          root = root.parent;
-        }
-        if (root.userData && root.userData.staff) {
-          selectStaff(root.userData.staff);
-        }
+      // On mobile/touch, test cross-points (finger tap radius tolerance)
+      const tolX = 18 / rect.width;
+      const tolY = 18 / rect.height;
+      const offsets = [
+        [tolX, 0], [-tolX, 0], [0, tolY], [0, -tolY],
+        [tolX * 0.7, tolY * 0.7], [-tolX * 0.7, tolY * 0.7], [tolX * 0.7, -tolY * 0.7], [-tolX * 0.7, -tolY * 0.7]
+      ];
+      for (const [ox, oy] of offsets) {
+        if (tryRaycast(ndcX + ox, ndcY + oy)) return;
       }
     }
 
