@@ -93,32 +93,103 @@
       align-items: center;
       gap: 5px;
     }
+    /* ==============================================================
+       FLOATING 2D DESK & AREA TAGS (HUD LABELS)
+       ============================================================== */
     .hud-tag-desk {
       pointer-events: auto;
       transform: translate(-50%, -100%);
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      color: #94a3b8;
-      font-size: 7.5px;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      padding: 1.5px 5px;
-      border-radius: 4px;
-      transition: all 0.2s;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #f1f5f9;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      opacity: 0.75;
       white-space: nowrap;
-      display: none; /* Sembunyikan floating tags by default karena sudah ada papan nama 3D */
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+      z-index: 35;
+      -webkit-tap-highlight-color: transparent;
     }
     .hud-tag-desk:hover {
-      border-color: #818cf8;
+      transform: translate(-50%, -115%) scale(1.08);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(99, 102, 241, 0.6);
       color: #ffffff;
-      background: rgba(49, 46, 129, 0.95);
-      transform: translate(-50%, -108%) scale(1.05);
-      opacity: 1;
+      z-index: 60;
+    }
+    .hud-tag-desk:active {
+      transform: translate(-50%, -102%) scale(0.97);
+    }
+
+    /* COLOR THEMES FOR 2D TAGS */
+    .hud-tag-emerald {
+      border-color: rgba(52, 211, 153, 0.5);
+      background: rgba(6, 78, 59, 0.92);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 0 14px rgba(16, 185, 129, 0.3);
+    }
+    .hud-tag-emerald:hover {
+      border-color: #34d399;
+      background: rgba(6, 95, 70, 0.98);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.7), 0 0 22px rgba(16, 185, 129, 0.6);
+    }
+    .hud-tag-indigo {
+      border-color: rgba(129, 140, 248, 0.5);
+      background: rgba(30, 27, 75, 0.92);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 0 14px rgba(99, 102, 241, 0.3);
+    }
+    .hud-tag-indigo:hover {
+      border-color: #818cf8;
+      background: rgba(49, 46, 129, 0.98);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.7), 0 0 22px rgba(99, 102, 241, 0.6);
+    }
+    .hud-tag-violet {
+      border-color: rgba(192, 132, 252, 0.5);
+      background: rgba(59, 7, 100, 0.92);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 0 14px rgba(168, 85, 247, 0.3);
+    }
+    .hud-tag-violet:hover {
+      border-color: #c084fc;
+      background: rgba(88, 28, 135, 0.98);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.7), 0 0 22px rgba(168, 85, 247, 0.6);
+    }
+    .hud-tag-cyan {
+      border-color: rgba(56, 189, 248, 0.5);
+      background: rgba(8, 51, 68, 0.92);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 0 14px rgba(14, 165, 233, 0.3);
+    }
+    .hud-tag-cyan:hover {
+      border-color: #38bdf8;
+      background: rgba(12, 74, 96, 0.98);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.7), 0 0 22px rgba(14, 165, 233, 0.6);
+    }
+    .hud-tag-amber, .hud-tag-gold {
+      border-color: rgba(251, 191, 36, 0.5);
+      background: rgba(69, 26, 3, 0.92);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 0 14px rgba(245, 158, 11, 0.3);
+    }
+    .hud-tag-amber:hover, .hud-tag-gold:hover {
+      border-color: #fbbf24;
+      background: rgba(120, 53, 15, 0.98);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.7), 0 0 22px rgba(245, 158, 11, 0.6);
+    }
+    .hud-tag-rose {
+      border-color: rgba(251, 113, 133, 0.5);
+      background: rgba(76, 5, 25, 0.92);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 0 14px rgba(244, 63, 94, 0.3);
+    }
+    .hud-tag-rose:hover {
+      border-color: #fb7185;
+      background: rgba(136, 19, 55, 0.98);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.7), 0 0 22px rgba(244, 63, 94, 0.6);
     }
     .glass-panel {
       background: rgba(15, 23, 42, 0.88);
@@ -175,12 +246,12 @@
         border: 1px solid rgba(255, 255, 255, 0.22);
       }
       .hud-tag-desk {
-        font-size: 6.5px !important;
-        padding: 1px 4px !important;
-        border-style: solid;
-        border-width: 0.5px;
-        opacity: 0.65;
-        transform: translate(-50%, -100%) scale(0.8);
+        font-size: 9.5px !important;
+        padding: 2.5px 7px !important;
+        gap: 4px !important;
+        border-width: 1px !important;
+        opacity: 0.95 !important;
+        transform: translate(-50%, -100%) scale(0.92);
       }
     }
   </style>
@@ -592,8 +663,8 @@
         <span class="text-slate-300 font-medium flex items-center gap-1.5">
           <i class="ph ph-tag text-indigo-400"></i> Label Meja Kerja di Ruangan
         </span>
-        <button onclick="toggleDeskTagsVisibility()" id="btn-toggle-desk-tags" class="px-2.5 py-1 rounded-lg bg-indigo-600/30 border border-indigo-400/40 text-[10px] font-bold text-indigo-300 hover:text-white transition-all">
-          Aktif
+        <button onclick="toggleDeskTagsVisibility()" id="btn-toggle-desk-tags" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 border border-emerald-500/50 text-[10px] font-bold text-emerald-300 hover:text-white transition-all">
+          Papan Nama 3D (Bersih)
         </button>
       </div>
 
@@ -1252,6 +1323,7 @@
       setupLighting();
       buildOfficeRoom();
       spawnStaffAvatars();
+      setupAllDeskTags();
       setupRaycasting();
 
       window.addEventListener('resize', onWindowResize);
@@ -2834,56 +2906,106 @@
     const ALL_DESK_TAGS = [];
     let areDeskTagsEnabled = false; // Bersih by default; Papan Nama Meja 3D sudah aktif di atas meja!
 
-    function createDeskTag(text, x, y, z, assignedStaffId = null) {
+    function createDeskTag({
+      text,
+      subtext = '',
+      icon = 'ph-identification-badge',
+      theme = 'indigo', // 'emerald', 'indigo', 'violet', 'cyan', 'amber', 'rose', 'gold'
+      x, y, z,
+      assignedStaffId = null,
+      onClick = null
+    }) {
       const div = document.createElement('div');
-      div.className = 'hud-tag-desk';
-      div.innerText = text;
-      div.onclick = () => {
-        gsap.to(controls.target, { x, y: 1.0, z, duration: 1.2, ease: 'power2.inOut' });
-        gsap.to(camera.position, { x: x - 4.5, y: y + 3.8, z: z + 5.5, duration: 1.2, ease: 'power2.inOut' });
+      div.className = `hud-tag-desk hud-tag-${theme}`;
+      div.id = `tag-${assignedStaffId || text.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+      div.title = `${text} ${subtext ? '(' + subtext + ')' : ''} - Klik untuk fokus & lihat profil/detail`;
+      
+      div.innerHTML = `
+        <i class="ph ${icon} text-xs sm:text-sm shrink-0"></i>
+        <div class="flex items-center gap-1">
+          <span class="tag-title font-bold text-white tracking-wide">${text}</span>
+          ${subtext ? `<span class="tag-subtext opacity-85 font-semibold text-[10px] sm:text-[11px] border-l border-white/20 pl-1">${subtext}</span>` : ''}
+        </div>
+      `;
+
+      div.onclick = (e) => {
+        e.stopPropagation();
+        if (typeof onClick === 'function') {
+          onClick();
+        } else if (assignedStaffId) {
+          const staff = STAFF_ROSTER.find(s => s.id === assignedStaffId);
+          if (staff) selectStaff(staff);
+        } else {
+          gsap.to(controls.target, { x, y: 1.0, z, duration: 1.2, ease: 'power2.inOut' });
+          gsap.to(camera.position, { x: x - 4.5, y: y + 3.8, z: z + 5.5, duration: 1.2, ease: 'power2.inOut' });
+        }
       };
 
       const label = new THREE.CSS2DObject(div);
       label.position.set(x, y, z);
+      label.visible = areDeskTagsEnabled; // Default false saat mode Papan Nama 3D aktif
       scene.add(label);
-      ALL_DESK_TAGS.push({ text, div, label, x, y, z, assignedStaffId });
+      ALL_DESK_TAGS.push({ text, subtext, div, label, x, y, z, assignedStaffId });
+      return label;
     }
 
-    function updateDeskTagText(staffId, newText) {
+    function updateDeskTagText(staffId, newText, newSubtext = null) {
       const tag = ALL_DESK_TAGS.find(t => t.assignedStaffId === staffId);
       if (tag && tag.div) {
-        tag.text = newText;
-        tag.div.innerText = newText;
+        const titleEl = tag.div.querySelector('.tag-title');
+        if (titleEl) titleEl.textContent = newText;
+        if (newSubtext !== null) {
+          let subEl = tag.div.querySelector('.tag-subtext');
+          if (subEl) subEl.textContent = newSubtext;
+        }
       }
     }
 
     function refreshDeskTagsVisibility() {
+      // 1. Tampilkan / sembunyikan semua Floating 2D Desk Tags
       ALL_DESK_TAGS.forEach(tag => {
-        if (!areDeskTagsEnabled) {
-          tag.div.style.display = 'none';
-          return;
+        if (tag.label) {
+          tag.label.visible = areDeskTagsEnabled;
         }
-        if (tag.assignedStaffId) {
-          const staff = STAFF_ROSTER.find(s => s.id === tag.assignedStaffId);
-          // If assigned staff is present and sitting at desk, hide desk tag to avoid overlapping text
-          if (staff && staff.status === 'Hadir' && staff.state === 'WORKING') {
-            tag.div.style.display = 'none';
-            return;
-          }
+        if (tag.div) {
+          tag.div.style.display = areDeskTagsEnabled ? 'inline-flex' : 'none';
         }
-        tag.div.style.display = 'block';
       });
+
+      // 2. Tampilkan / sembunyikan 3D Physical Desk Nameplates
+      // - Mode "Papan Nama 3D" (areDeskTagsEnabled = false): Papan nama 3D di atas meja menyala
+      // - Mode "Label 2D On" (areDeskTagsEnabled = true): Papan nama 3D disembunyikan agar berganti ke label 2D melayang
+      if (typeof INTERACTIVE_NAMEPLATES !== 'undefined') {
+        INTERACTIVE_NAMEPLATES.forEach(np => {
+          np.visible = !areDeskTagsEnabled;
+        });
+      }
+
+      // 3. Selaraskan balon nama karakter di atas kepala (CSS2D)
+      if (typeof STAFF_ROSTER !== 'undefined') {
+        STAFF_ROSTER.forEach(s => {
+          if (s.hud) {
+            // Pada mode Papan Nama 3D: ruangan bersih, nama cukup terbaca di plakat 3D meja
+            // Pada mode Label 2D On: balon nama melayang di atas kepala aktif
+            s.hud.visible = areDeskTagsEnabled && s.status === 'Hadir' && s.mesh && s.mesh.visible;
+          }
+        });
+      }
     }
 
     function toggleDeskTagsVisibility() {
       areDeskTagsEnabled = !areDeskTagsEnabled;
-      const btn = document.getElementById('btn-toggle-desk-tags');
-      if (btn) {
-        btn.innerText = areDeskTagsEnabled ? 'Label 2D Aktif' : 'Papan Nama 3D (Bersih)';
-        btn.className = areDeskTagsEnabled 
-          ? 'px-2.5 py-1 rounded-lg bg-indigo-600/30 border border-indigo-400/40 text-[10px] font-bold text-indigo-300 hover:text-white transition-all'
+      
+      // 1. Update tombol modal jika terbuka
+      const btnModal = document.getElementById('btn-toggle-desk-tags');
+      if (btnModal) {
+        btnModal.innerText = areDeskTagsEnabled ? 'Label 2D Aktif' : 'Papan Nama 3D (Bersih)';
+        btnModal.className = areDeskTagsEnabled 
+          ? 'px-2.5 py-1 rounded-lg bg-indigo-600/40 border border-indigo-400/50 text-[10px] font-bold text-indigo-300 hover:text-white transition-all shadow-md'
           : 'px-2.5 py-1 rounded-lg bg-emerald-950/80 border border-emerald-500/50 text-[10px] font-bold text-emerald-300 hover:text-white transition-all';
       }
+
+      // 2. Update tombol control bar di footer
       const labelTag = document.getElementById('label-mode-tag');
       const footerBtn = document.getElementById('btn-toggle-labels');
       if (labelTag) {
@@ -2891,39 +3013,198 @@
       }
       if (footerBtn) {
         footerBtn.className = areDeskTagsEnabled 
-          ? 'glass-button px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-semibold flex items-center gap-1.5 text-indigo-300 border-indigo-500/40'
+          ? 'glass-button active px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-semibold flex items-center gap-1.5 text-indigo-300 border-indigo-500/50 shadow-lg shadow-indigo-500/25'
           : 'glass-button active px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-semibold flex items-center gap-1.5 text-emerald-300 border-emerald-500/40';
+        const icon = footerBtn.querySelector('i');
+        if (icon) {
+          icon.className = areDeskTagsEnabled 
+            ? 'ph ph-tag text-xs sm:text-sm text-indigo-400' 
+            : 'ph ph-identification-badge text-xs sm:text-sm text-emerald-400';
+        }
       }
       refreshDeskTagsVisibility();
     }
 
-    function createSignboardDeskTag(text, x, y, z) {
-      const div = document.createElement('div');
-      div.className = 'hud-tag-desk border-emerald-400/60 bg-emerald-950/80 text-emerald-300';
-      div.innerHTML = `<span class="flex items-center gap-1.5"><i class="ph ph-shield-check text-emerald-400"></i> ${text}</span>`;
-      div.onclick = () => {
-        focusPreset('logo');
-        openSignboardModal();
-      };
+    function setupAllDeskTags() {
+      if (ALL_DESK_TAGS.length > 0) return;
 
-      const label = new THREE.CSS2DObject(div);
-      label.position.set(x, y, z);
-      scene.add(label);
-    }
+      // 1. Meja Manajer Adamart - Ibu Mahmudah
+      createDeskTag({
+        text: 'Manajer Adamart',
+        subtext: 'Ibu Mahmudah',
+        icon: 'ph-storefront',
+        theme: 'emerald',
+        x: -3.5, y: 1.85, z: -5.0,
+        assignedStaffId: 'mahmuda',
+        onClick: () => {
+          const s = STAFF_ROSTER.find(item => item.id === 'mahmuda');
+          if (s) selectStaff(s);
+        }
+      });
 
-    function createPhotoDeskTag(text, x, y, z, photoType) {
-      const div = document.createElement('div');
-      div.className = 'hud-tag-desk border-amber-400/60 bg-slate-900/90 text-amber-300 hover:scale-105 transition-all';
-      div.innerHTML = `<span class="flex items-center gap-1.5"><i class="ph ph-image text-amber-400"></i> ${text}</span>`;
-      div.onclick = () => {
-        focusPreset(photoType === 'pengurus' ? 'foto-pengurus' : 'foto-pengelola');
-        openPhotoModal(photoType);
-      };
+      // 2. Meja Keuangan & Kas - Mbak Sri
+      createDeskTag({
+        text: 'Keuangan & Kas',
+        subtext: 'Mbak Sri',
+        icon: 'ph-coins',
+        theme: 'indigo',
+        x: -7.4, y: 1.85, z: 1.8,
+        assignedStaffId: 'sri',
+        onClick: () => {
+          const s = STAFF_ROSTER.find(item => item.id === 'sri');
+          if (s) selectStaff(s);
+        }
+      });
 
-      const label = new THREE.CSS2DObject(div);
-      label.position.set(x, y, z);
-      scene.add(label);
-      ALL_DESK_TAGS.push({ text, div, label, x, y, z, assignedStaffId: null });
+      // 3. Meja Pembukuan & Pajak - Mbak Rika
+      createDeskTag({
+        text: 'Pembukuan & Pajak',
+        subtext: 'Mbak Rika',
+        icon: 'ph-calculator',
+        theme: 'violet',
+        x: -7.4, y: 1.85, z: 4.4,
+        assignedStaffId: 'rika',
+        onClick: () => {
+          const s = STAFF_ROSTER.find(item => item.id === 'rika');
+          if (s) selectStaff(s);
+        }
+      });
+
+      // 4. Meja Tour & Travel - Zahrah
+      createDeskTag({
+        text: 'Tour & Travel',
+        subtext: 'Zahrah',
+        icon: 'ph-airplane-tilt',
+        theme: 'cyan',
+        x: -3.5, y: 1.85, z: 3.6,
+        assignedStaffId: 'zahrah',
+        onClick: () => {
+          const s = STAFF_ROSTER.find(item => item.id === 'zahrah');
+          if (s) selectStaff(s);
+        }
+      });
+
+      // 5. Ruang Manajer Koperasi - Pak Fedrik
+      createDeskTag({
+        text: 'Manajer Koperasi',
+        subtext: 'Pak Fedrik',
+        icon: 'ph-user-gear',
+        theme: 'gold',
+        x: -10.0, y: 1.85, z: -5.0,
+        assignedStaffId: 'fedrik',
+        onClick: () => {
+          const s = STAFF_ROSTER.find(item => item.id === 'fedrik');
+          if (s) selectStaff(s);
+        }
+      });
+
+      // 6. Meja Resepsionis & Pusat Informasi Layanan Anggota
+      createDeskTag({
+        text: 'Layanan Anggota',
+        subtext: 'Resepsionis',
+        icon: 'ph-chats-circle',
+        theme: 'emerald',
+        x: -10.2, y: 1.90, z: -1.0,
+        onClick: () => {
+          selectPreset('reception', 'Resepsionis');
+          openDirectoryModal();
+        }
+      });
+
+      // 7. Kasir Minimarket Adamart 73
+      createDeskTag({
+        text: 'Kasir Adamart 73',
+        subtext: 'M. Sahap',
+        icon: 'ph-shopping-cart',
+        theme: 'rose',
+        x: 5.5, y: 1.85, z: -4.0,
+        assignedStaffId: 'sahap',
+        onClick: () => {
+          const s = STAFF_ROSTER.find(item => item.id === 'sahap');
+          if (s) selectStaff(s);
+        }
+      });
+
+      // 8. Kasir Minimarket Adamart Kelanis
+      createDeskTag({
+        text: 'Kasir Kelanis',
+        subtext: 'Azimah',
+        icon: 'ph-shopping-cart',
+        theme: 'amber',
+        x: 5.5, y: 1.85, z: 3.5,
+        assignedStaffId: 'kasir-kelanis',
+        onClick: () => {
+          const s = STAFF_ROSTER.find(item => item.id === 'kasir-kelanis');
+          if (s) selectStaff(s);
+        }
+      });
+
+      // 9. Ruang Rapat & Presentasi
+      createDeskTag({
+        text: 'Ruang Rapat & Presentasi',
+        subtext: 'Kopkar AKM',
+        icon: 'ph-users-three',
+        theme: 'indigo',
+        x: 0, y: 2.10, z: -0.5,
+        onClick: () => {
+          selectPreset('meeting', 'Ruang Rapat');
+        }
+      });
+
+      // 10. Galeri Dinding Penghargaan & Piagam Prestasi
+      createDeskTag({
+        text: 'Dinding Penghargaan',
+        subtext: 'Prestasi Koperasi',
+        icon: 'ph-trophy',
+        theme: 'gold',
+        x: -12.1, y: 4.30, z: 6.2,
+        onClick: () => {
+          focusPreset('gallery-awards');
+          openAwardsModal();
+        }
+      });
+
+      // 11. Galeri Dokumentasi Foto Pengurus & Pengawas
+      createDeskTag({
+        text: 'Foto Pengurus & Pengawas',
+        subtext: 'RAT Kopkar AKM',
+        icon: 'ph-image',
+        theme: 'gold',
+        x: -7.0, y: 4.40, z: -8.7,
+        onClick: () => {
+          focusPreset('foto-pengurus');
+          openPhotoModal('pengurus');
+        }
+      });
+
+      // 12. Galeri Dokumentasi Foto Pengelola & Manajemen
+      createDeskTag({
+        text: 'Foto Pengelola Koperasi',
+        subtext: 'Tim Manajemen',
+        icon: 'ph-image',
+        theme: 'gold',
+        x: -12.1, y: 4.30, z: -4.5,
+        onClick: () => {
+          focusPreset('foto-pengelola');
+          openPhotoModal('pengelola');
+        }
+      });
+
+      // 13. Papan Nama & Logo Resmi Koperasi
+      createDeskTag({
+        text: 'Plang Resmi Kopkar AKM',
+        subtext: 'Koperasi Jasa',
+        icon: 'ph-shield-check',
+        theme: 'emerald',
+        x: 0, y: 5.50, z: -9.5,
+        onClick: () => {
+          focusPreset('logo');
+          openSignboardModal();
+        }
+      });
+
+      // Sinkronkan visibilitas awal (default false / disembunyikan agar bersih)
+      refreshDeskTagsVisibility();
     }
 
     /* 8. MEJA RESEPSIONIS & PUSAT INFORMASI LAYANAN ANGGOTA */
@@ -3024,19 +3305,6 @@
       scene.add(g);
     }
 
-    function createReceptionDeskTag(text, x, y, z) {
-      const div = document.createElement('div');
-      div.className = 'hud-tag-desk border-emerald-400/80 bg-emerald-950/90 text-emerald-300 font-bold shadow-lg shadow-emerald-500/25';
-      div.innerHTML = `<span class="flex items-center gap-1.5"><i class="ph ph-chats-circle text-emerald-400 text-xs"></i> ${text}</span>`;
-      div.onclick = () => {
-        selectPreset('reception', 'Resepsionis');
-        openDirectoryModal();
-      };
-
-      const label = new THREE.CSS2DObject(div);
-      label.position.set(x, y, z);
-      scene.add(label);
-    }
 
     /* SITTING POSTURE */
     function applySittingPose(mesh, heading) {
