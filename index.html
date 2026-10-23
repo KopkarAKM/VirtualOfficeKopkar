@@ -1691,19 +1691,24 @@
       base.position.y = 0.5;
       g.add(base);
 
-      // POS Monitoring Dashboard PC (screen facing manager at -Z)
-      const mon = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.5, 0.04), new THREE.MeshBasicMaterial({ color: 0x10b981 }));
-      mon.position.set(0, 1.45, 0.18);
+      // POS Monitoring Dashboard PC (screen placed neatly to side so manager's face is 100% visible)
+      const monStand = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.05, 0.25), new THREE.MeshStandardMaterial({ color: 0x334155 }));
+      monStand.position.set(-0.52, 1.22, 0.1);
+      g.add(monStand);
+
+      const mon = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.44, 0.04), new THREE.MeshBasicMaterial({ color: 0x10b981 }));
+      mon.position.set(-0.52, 1.44, 0.1);
+      mon.rotation.y = 0.18; // Miring menghadap sedikit ke arah Ibu Mahmudah
       g.add(mon);
 
       // Keyboard
-      const kb = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.02, 0.16), new THREE.MeshStandardMaterial({ color: 0x334155 }));
-      kb.position.set(0, 1.11, -0.16);
+      const kb = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.02, 0.14), new THREE.MeshStandardMaterial({ color: 0x334155 }));
+      kb.position.set(-0.52, 1.11, -0.16);
       g.add(kb);
 
-      // Retail Inventory Binder / Ledger
-      const binder = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.06, 0.4), new THREE.MeshStandardMaterial({ color: 0xf59e0b }));
-      binder.position.set(0.6, 1.13, -0.1);
+      // Retail Inventory Binder / Ledger on the other side
+      const binder = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.05, 0.38), new THREE.MeshStandardMaterial({ color: 0xf59e0b }));
+      binder.position.set(0.62, 1.13, -0.1);
       g.add(binder);
 
       // Physical 3D Desk Nameplate: "MANAJER ADAMART - IBU MAHMUDAH"
@@ -1716,7 +1721,7 @@
         assignedStaffId: 'mahmuda',
         targetFocus: { x: -3.5, y: 1.1, z: -5.0 }
       });
-      nameplate.position.set(0.38, 1.11, 0.35);
+      nameplate.position.set(0.35, 1.11, 0.32);
       g.add(nameplate);
 
       // Chair (tucked neatly into desk)
@@ -1923,21 +1928,140 @@
         confGroup.add(chair);
       });
 
+      // SMART PORTABLE STANDING TV / PRESENTATION DISPLAY
+      // Dipindahkan ke ujung timur meja rapat (x = 2.8, z = 0) menghadap ke barat (-PI/2)
+      // agar TIDAK menghalangi koridor dan pandangan lurus ke Meja Manajer Adamart (Ibu Mahmudah)!
       const boardGroup = new THREE.Group();
-      boardGroup.position.set(-2.8, 0, -2.4);
-      boardGroup.rotation.y = Math.PI / 4;
+      boardGroup.position.set(2.8, 0, 0);
+      boardGroup.rotation.y = -Math.PI / 2; // Menghadap ke arah seluruh peserta rapat & meja konferensi
 
-      const boardFrame = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.1, 0.06), new THREE.MeshStandardMaterial({ color: 0x94a3b8 }));
-      boardFrame.position.y = 1.6;
-      boardGroup.add(boardFrame);
+      // Trolley mobile base dengan 4 roda kastor
+      const trolleyBase = new THREE.Mesh(
+        new THREE.BoxGeometry(0.85, 0.04, 0.55),
+        new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4, metalness: 0.8 })
+      );
+      trolleyBase.position.y = 0.08;
+      boardGroup.add(trolleyBase);
 
-      const boardFace = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.0), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-      boardFace.position.set(0, 1.6, 0.04);
-      boardGroup.add(boardFace);
+      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3 });
+      [[-0.38, -0.22], [0.38, -0.22], [-0.38, 0.22], [0.38, 0.22]].forEach(([wx, wz]) => {
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.03, 12), wheelMat);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(wx, 0.04, wz);
+        boardGroup.add(wheel);
+      });
 
-      const standLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.2), new THREE.MeshStandardMaterial({ color: 0x334155 }));
-      standLeg.position.y = 0.6;
-      boardGroup.add(standLeg);
+      // Dual titanium upright stand poles
+      const poleGeo = new THREE.CylinderGeometry(0.028, 0.028, 1.35, 16);
+      const poleMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.85, roughness: 0.2 });
+      const poleL = new THREE.Mesh(poleGeo, poleMat);
+      poleL.position.set(-0.16, 0.72, 0);
+      boardGroup.add(poleL);
+      const poleR = new THREE.Mesh(poleGeo, poleMat);
+      poleR.position.set(0.16, 0.72, 0);
+      boardGroup.add(poleR);
+
+      // Rak dudukan perangkat / remote
+      const tvShelf = new THREE.Mesh(
+        new THREE.BoxGeometry(0.65, 0.02, 0.24),
+        new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3 })
+      );
+      tvShelf.position.set(0, 0.82, 0.06);
+      boardGroup.add(tvShelf);
+
+      // Frame Smart TV 65 Inch (Bezel Tipis Mewah)
+      const tvFrameGeo = new THREE.BoxGeometry(1.68, 1.02, 0.05);
+      const tvFrameMat = new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.2, metalness: 0.85 });
+      const tvFrame = new THREE.Mesh(tvFrameGeo, tvFrameMat);
+      tvFrame.position.set(0, 1.62, 0);
+      tvFrame.castShadow = true;
+      boardGroup.add(tvFrame);
+
+      // Soundbar speaker di bawah TV
+      const soundbar = new THREE.Mesh(
+        new THREE.BoxGeometry(1.2, 0.07, 0.06),
+        new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.6 })
+      );
+      soundbar.position.set(0, 1.07, 0.02);
+      boardGroup.add(soundbar);
+
+      // Kanvas Tampilan Slide Presentasi Smart TV Rapat
+      const presCanvas = document.createElement('canvas');
+      presCanvas.width = 1024;
+      presCanvas.height = 576;
+      const pCtx = presCanvas.getContext('2d');
+
+      const pGrad = pCtx.createLinearGradient(0, 0, 1024, 576);
+      pGrad.addColorStop(0, '#090d16');
+      pGrad.addColorStop(0.5, '#0f172a');
+      pGrad.addColorStop(1, '#022c22');
+      pCtx.fillStyle = pGrad;
+      pCtx.fillRect(0, 0, 1024, 576);
+
+      // Header slide
+      pCtx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+      pCtx.fillRect(36, 36, 952, 70);
+      pCtx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
+      pCtx.lineWidth = 2;
+      pCtx.strokeRect(36, 36, 952, 70);
+
+      pCtx.fillStyle = '#10b981';
+      pCtx.font = 'bold 24px "DM Sans", sans-serif';
+      pCtx.fillText('AGENDA RAPAT KOORDINASI & EVALUASI OPERASIONAL', 60, 80);
+
+      // Card kiri: Poin bahasan
+      pCtx.fillStyle = 'rgba(30, 41, 59, 0.8)';
+      pCtx.fillRect(36, 130, 450, 360);
+      pCtx.strokeRect(36, 130, 450, 360);
+
+      pCtx.fillStyle = '#38bdf8';
+      pCtx.font = 'bold 20px "DM Sans", sans-serif';
+      pCtx.fillText('POIN PEMBAHASAN UTAMA', 60, 175);
+      pCtx.fillStyle = '#e2e8f0';
+      pCtx.font = '17px "DM Sans", sans-serif';
+      pCtx.fillText('• Evaluasi Omzet Toko Adamart 73 & Kelanis', 60, 225);
+      pCtx.fillText('• Program Simpan Pinjam & Likuiditas Kas', 60, 275);
+      pCtx.fillText('• Ekspansi Unit Bisnis Tour & Travel Anggota', 60, 325);
+      pCtx.fillText('• Digitalisasi Presensi GPS & Pelayanan Anggota', 60, 375);
+      pCtx.fillText('• Persiapan Rencana Kerja Periode 2026', 60, 425);
+
+      // Card kanan: Chart KPI Koperasi
+      pCtx.fillStyle = 'rgba(30, 41, 59, 0.8)';
+      pCtx.fillRect(520, 130, 468, 360);
+      pCtx.strokeRect(520, 130, 468, 360);
+
+      pCtx.fillStyle = '#f59e0b';
+      pCtx.font = 'bold 20px "DM Sans", sans-serif';
+      pCtx.fillText('TARGET KINERJA & INDIKATOR KOPERASI', 545, 175);
+      
+      const bars = [
+        { label: 'Kepuasan Anggota', val: 0.94, col: '#10b981' },
+        { label: 'Efisiensi Operasional', val: 0.88, col: '#38bdf8' },
+        { label: 'Pertumbuhan Omzet', val: 0.85, col: '#f59e0b' },
+        { label: 'Tingkat Hadir Staf', val: 0.92, col: '#6366f1' }
+      ];
+      bars.forEach((b, idx) => {
+        const by = 220 + idx * 65;
+        pCtx.fillStyle = '#cbd5e1';
+        pCtx.font = '15px "DM Sans", sans-serif';
+        pCtx.fillText(b.label, 545, by);
+        pCtx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        pCtx.fillRect(545, by + 10, 410, 18);
+        pCtx.fillStyle = b.col;
+        pCtx.fillRect(545, by + 10, 410 * b.val, 18);
+      });
+
+      pCtx.fillStyle = '#64748b';
+      pCtx.font = '14px monospace';
+      pCtx.fillText('KOPKAR ADARO KARYA MANDIRI · SMART PRESENTATION DISPLAY 4K', 60, 530);
+
+      const presTex = new THREE.CanvasTexture(presCanvas);
+      const tvScreen = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.60, 0.94),
+        new THREE.MeshBasicMaterial({ map: presTex })
+      );
+      tvScreen.position.set(0, 1.62, 0.028);
+      boardGroup.add(tvScreen);
 
       confGroup.add(boardGroup);
 
@@ -3898,15 +4022,19 @@
             if (obj && obj.userData) {
               if (obj.userData.assignedStaffId) {
                 const staff = STAFF_ROSTER.find(s => s.id === obj.userData.assignedStaffId);
-                if (staff) selectStaff(staff);
+                if (staff) {
+                  selectStaff(staff);
+                  return true;
+                }
               }
               if (typeof obj.userData.onClick === 'function') {
                 obj.userData.onClick();
+                return true;
               }
               if (obj.userData.targetFocus) {
                 const tf = obj.userData.targetFocus;
-                gsap.to(controls.target, { x: tf.x, y: 1.0, z: tf.z, duration: 1.2, ease: 'power2.inOut' });
-                gsap.to(camera.position, { x: tf.x - 4.2, y: tf.y + 3.5, z: tf.z + 5.2, duration: 1.2, ease: 'power2.inOut' });
+                gsap.to(controls.target, { x: tf.x, y: 1.18, z: tf.z, duration: 1.3, ease: 'power2.inOut' });
+                gsap.to(camera.position, { x: tf.x - 2.8, y: 1.45, z: tf.z + 2.8, duration: 1.3, ease: 'power2.inOut' });
               }
               return true;
             }
@@ -3975,6 +4103,95 @@
       for (const [ox, oy] of offsets) {
         if (tryRaycast(ndcX + ox, ndcY + oy)) return;
       }
+    }
+
+    /* =====================================================================
+       FRONTAL PERPENDICULAR POV CAMERA ENGINE (TAMPAK DEPAN TEGAK LURUS)
+       Menghitung sudut pandang tegak lurus tepat di depan meja staf & NPC,
+       seperti nasabah/tamu yang berdiri berhadapan langsung secara simetris.
+       ===================================================================== */
+    function getStaffFrontPov(staff) {
+      const isMobile = window.innerWidth < 768;
+      // Jarak kamera: 3.3m pada HP agar tidak tertutup bottom-sheet, 2.75m pada laptop untuk komposisi pas
+      const dist = isMobile ? 3.3 : 2.75;
+      const camY = isMobile ? 1.55 : 1.42;
+      const targetY = isMobile ? 1.25 : 1.18;
+
+      const configs = {
+        'fedrik': {
+          // Meja Manajer Koperasi: x: -8.0, z: -4.2, rotasi: 45° (PI/4). Vektor normal tegak lurus depan: (+0.7071, +0.7071)
+          normalX: 0.7071, normalZ: 0.7071,
+          deskX: -8.0, deskZ: -4.2
+        },
+        'mahmuda': {
+          // Meja Manajer Adamart: x: -3.5, z: -5.0, menghadap selatan (+Z). Vektor normal tegak lurus depan: (0, +1)
+          normalX: 0, normalZ: 1.0,
+          deskX: -3.5, deskZ: -5.0
+        },
+        'sri': {
+          // Meja Keuangan 1 (Mbak Sri): x: -7.4, z: 1.8, menghadap timur (+X). Vektor normal tegak lurus depan: (+1, 0)
+          normalX: 1.0, normalZ: 0,
+          deskX: -7.5, deskZ: 1.8
+        },
+        'rika': {
+          // Meja Keuangan 2 (Mbak Rika): x: -7.4, z: 4.4, menghadap timur (+X). Vektor normal tegak lurus depan: (+1, 0)
+          normalX: 1.0, normalZ: 0,
+          deskX: -7.5, deskZ: 4.4
+        },
+        'zahrah': {
+          // Meja Tour & Travel: x: -3.5, z: 3.6, Mbak Zahrah duduk di +Z menghadap utara (-Z). Vektor normal tegak lurus depan: (0, -1)
+          normalX: 0, normalZ: -1.0,
+          deskX: -3.5, deskZ: 3.8
+        },
+        'sahap': {
+          // Kasir Adamart 73: x: 5.5, z: -4.0, kasir di +X menghadap barat (-X). Vektor normal tegak lurus meja kasir: (-1, 0)
+          normalX: -1.0, normalZ: 0,
+          deskX: 5.7, deskZ: -4.0
+        },
+        'kasir-kelanis': {
+          // Kasir Adamart Kelanis: x: 5.5, z: 3.5, kasir di +X menghadap barat (-X). Vektor normal tegak lurus meja kasir: (-1, 0)
+          normalX: -1.0, normalZ: 0,
+          deskX: 5.7, deskZ: 3.5
+        }
+      };
+
+      if (staff && configs[staff.id]) {
+        const c = configs[staff.id];
+        // Jika staf sedang berjalan dalam simulasi mobilitas, tatap lurus dari arah depan langkah staf
+        if (staff.state === 'WALKING' && staff.mesh) {
+          const px = staff.mesh.position.x;
+          const pz = staff.mesh.position.z;
+          const heading = staff.mesh.rotation.y;
+          return {
+            cam: {
+              x: px + Math.sin(heading) * dist,
+              y: camY,
+              z: pz + Math.cos(heading) * dist
+            },
+            target: { x: px, y: targetY, z: pz }
+          };
+        }
+
+        return {
+          cam: {
+            x: c.deskX + c.normalX * dist,
+            y: camY,
+            z: c.deskZ + c.normalZ * dist
+          },
+          target: {
+            x: c.deskX,
+            y: targetY,
+            z: c.deskZ
+          }
+        };
+      }
+
+      // Fallback dinamis
+      const targetPos = staff && staff.mesh ? staff.mesh.position : (staff ? staff.deskPosition : { x: 0, y: 0, z: 0 });
+      return {
+        cam: { x: targetPos.x - dist * 0.7, y: camY, z: targetPos.z + dist * 0.7 },
+        target: { x: targetPos.x, y: targetY, z: targetPos.z }
+      };
     }
 
     function selectStaff(staff) {
@@ -4079,8 +4296,7 @@
         badge.className = 'text-xs font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-1.5';
         badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Belum Presensi Masuk (Meja Kosong)`;
         followBtn.innerHTML = `<i class="ph ph-crosshair"></i> Lihat Meja Kerja Kosong`;
-        gsap.to(controls.target, { x: staff.deskPosition.x, y: 1.1, z: staff.deskPosition.z, duration: 1.2, ease: 'power2.inOut' });
-        gsap.to(camera.position, { x: staff.deskPosition.x - 4, y: 4, z: staff.deskPosition.z + 5, duration: 1.2, ease: 'power2.inOut' });
+        followCurrentTarget();
       }
 
       document.querySelectorAll('#staff-dock button').forEach(b => b.classList.remove('border-indigo-400', 'bg-indigo-600/30'));
@@ -4386,17 +4602,14 @@
       const staff = STAFF_ROSTER.find(s => s.id === staffId);
       if (staff) {
         selectStaff(staff);
-        gsap.to(controls.target, { x: staff.deskPosition.x, y: 1.1, z: staff.deskPosition.z, duration: 1.2, ease: 'power2.inOut' });
-        gsap.to(camera.position, { x: staff.deskPosition.x - 4, y: 3.8, z: staff.deskPosition.z + 5, duration: 1.2, ease: 'power2.inOut' });
       }
     }
 
     function followCurrentTarget() {
-      if (!selectedStaff || (selectedStaff.status !== 'Hadir' && selectedStaff.status !== 'Sudah Pulang')) return;
-      const targetPos = selectedStaff.mesh ? selectedStaff.mesh.position : selectedStaff.deskPosition;
-
-      gsap.to(controls.target, { x: targetPos.x, y: 1.2, z: targetPos.z, duration: 1.2, ease: 'power2.inOut' });
-      gsap.to(camera.position, { x: targetPos.x - 4, y: targetPos.y + 3.2, z: targetPos.z + 4.5, duration: 1.2, ease: 'power2.inOut' });
+      if (!selectedStaff) return;
+      const pov = getStaffFrontPov(selectedStaff);
+      gsap.to(controls.target, { x: pov.target.x, y: pov.target.y, z: pov.target.z, duration: 1.3, ease: 'power2.inOut' });
+      gsap.to(camera.position, { x: pov.cam.x, y: pov.cam.y, z: pov.cam.z, duration: 1.3, ease: 'power2.inOut' });
     }
 
     function makeCurrentTargetWalk() {
@@ -4409,19 +4622,23 @@
       const activeBtn = document.getElementById(`btn-cam-${presetKey}`);
       if (activeBtn) activeBtn.classList.add('active');
 
+      const isMobile = window.innerWidth < 768;
+      const camY = isMobile ? 1.55 : 1.45;
+      const targetY = isMobile ? 1.25 : 1.18;
+
       const presets = {
         'overview': { cam: { x: -18, y: 16, z: 18 }, target: { x: 0, y: 0.8, z: 0 } },
-        'reception': { cam: { x: -6.5, y: 3.2, z: 2.2 }, target: { x: -10.2, y: 1.1, z: -1.0 } },
+        'reception': { cam: { x: -7.4, y: camY, z: -1.0 }, target: { x: -10.2, y: targetY, z: -1.0 } },
         'logo': { cam: { x: -7.5, y: 3.5, z: 2.3 }, target: { x: -12.26, y: 3.5, z: 2.3 } },
         'penghargaan': { cam: { x: -6.5, y: 3.5, z: 6.2 }, target: { x: -12.26, y: 3.5, z: 6.2 } },
         'emblem': { cam: { x: -2.85, y: 4.10, z: -4.2 }, target: { x: -2.85, y: 4.10, z: -8.95 } },
-        'manager-kop': { cam: { x: -11.5, y: 3.5, z: -1.2 }, target: { x: -8.0, y: 1.1, z: -4.2 } },
-        'manager-ada': { cam: { x: -6.5, y: 3.5, z: -2.0 }, target: { x: -3.5, y: 1.1, z: -5.0 } },
-        'finance': { cam: { x: -11.0, y: 4.5, z: 5.5 }, target: { x: -7.4, y: 1.1, z: 3.1 } },
-        'tour-travel': { cam: { x: -6.5, y: 3.5, z: 6.5 }, target: { x: -3.5, y: 1.1, z: 3.6 } },
+        'manager-kop': { cam: { x: -6.02, y: camY, z: -2.22 }, target: { x: -8.0, y: targetY, z: -4.2 } },
+        'manager-ada': { cam: { x: -3.5, y: camY, z: -2.25 }, target: { x: -3.5, y: targetY, z: -5.0 } },
+        'finance': { cam: { x: -4.7, y: camY, z: 3.1 }, target: { x: -7.5, y: targetY, z: 3.1 } },
+        'tour-travel': { cam: { x: -3.5, y: camY, z: 0.95 }, target: { x: -3.5, y: targetY, z: 3.8 } },
         'conference': { cam: { x: -4, y: 5.0, z: 4.5 }, target: { x: 0, y: 1.1, z: -0.5 } },
-        'adamart73': { cam: { x: 2.2, y: 3.5, z: -1.8 }, target: { x: 5.5, y: 1.1, z: -4 } },
-        'kelanis': { cam: { x: 2.2, y: 3.5, z: 5.8 }, target: { x: 5.5, y: 1.1, z: 3.5 } },
+        'adamart73': { cam: { x: 2.8, y: camY, z: -4.0 }, target: { x: 5.7, y: targetY, z: -4.0 } },
+        'kelanis': { cam: { x: 2.8, y: camY, z: 3.5 }, target: { x: 5.7, y: targetY, z: 3.5 } },
         'foto-pengurus': { cam: { x: -7.0, y: 3.8, z: -4.0 }, target: { x: -7.0, y: 3.8, z: -8.95 } },
         'foto-pengelola': { cam: { x: -8.0, y: 3.5, z: -4.5 }, target: { x: -12.26, y: 3.5, z: -4.5 } }
       };
@@ -4430,6 +4647,7 @@
       gsap.to(camera.position, { x: p.cam.x, y: p.cam.y, z: p.cam.z, duration: 1.4, ease: 'power2.inOut' });
       gsap.to(controls.target, { x: p.target.x, y: p.target.y, z: p.target.z, duration: 1.4, ease: 'power2.inOut' });
     }
+
 
     function resetCamera() {
       focusPreset('overview');
