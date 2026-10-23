@@ -44,16 +44,17 @@
 
     .hud-label {
       pointer-events: auto;
-      transform: translate(-50%, -100%);
+      transform: translate(-50%, -100%) scale(0.68);
+      transform-origin: bottom center;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
+      gap: 2px;
       transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;
     }
     .hud-label:hover {
-      transform: translate(-50%, -108%) scale(1.06);
+      transform: translate(-50%, -100%) scale(0.82);
       z-index: 50;
     }
     .hud-bubble-action {
@@ -61,15 +62,15 @@
       backdrop-filter: blur(8px);
       border: 1px solid rgba(99, 102, 241, 0.5);
       color: #cbd5e1;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 600;
-      padding: 2.5px 8px;
+      padding: 2px 7px;
       border-radius: 9999px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.4);
       white-space: nowrap;
       display: none; /* Bersih by default */
       align-items: center;
-      gap: 4px;
+      gap: 3.5px;
       pointer-events: none;
       animation: fadeInBubble 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -82,16 +83,16 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
     .hud-bubble-name {
-      background: rgba(15, 23, 42, 0.92);
-      backdrop-filter: blur(12px);
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.18);
-      padding: 2.5px 8px;
+      padding: 2px 7px;
       border-radius: 9999px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
       white-space: nowrap;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
     }
     /* ==============================================================
        FLOATING 2D DESK & AREA TAGS (HUD LABELS)
@@ -233,17 +234,21 @@
 
     @media (max-width: 640px) {
       .hud-label {
-        transform: translate(-50%, -100%) scale(0.85);
+        transform: translate(-50%, -100%) scale(0.60);
+      }
+      .hud-label:hover {
+        transform: translate(-50%, -100%) scale(0.72);
       }
       .hud-bubble-action {
         display: none !important; /* Sembunyikan kalimat aktivitas panjang di layar HP agar tidak tabrakan/menumpuk */
       }
       .hud-bubble-name {
-        font-size: 10px;
-        padding: 2.5px 8px;
+        font-size: 9.5px;
+        padding: 1.5px 6px;
         border-radius: 9999px;
-        background: rgba(15, 23, 42, 0.96);
-        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(15, 23, 42, 0.94);
+        border: 1px solid rgba(255, 255, 255, 0.20);
+        gap: 3.5px;
       }
       .hud-tag-desk {
         font-size: 9.5px !important;
@@ -819,9 +824,9 @@
         // Chair coordinate directly behind executive desk (tucked in)
         deskPosition: { x: -8.48, z: -4.68 },
         deskRotation: Math.PI / 4,
-        checkIn: '--:--',
-        checkOut: '--:--',
-        status: 'Belum Hadir',
+        checkIn: '07:45:38',
+        checkOut: '17:04:09',
+        status: 'Sudah Pulang',
         locationStr: 'Kantor Kopkar AKM (-2.176007, 115.423090)',
         color: 0x1e3a8a, // Navy Executive Suit
         topColor: 0x1e3a8a,
@@ -836,7 +841,7 @@
         shoeType: 'formal',
         shoeColor: 0x0a0a0a,
         accessory: 'tie',
-        currentActivity: 'Duduk di Meja Manajer Koperasi',
+        currentActivity: 'Presensi Pulang (17:04)',
         targetX: -8.48, targetZ: -4.68,
         curX: -8.48, curZ: -4.68,
         heading: Math.PI / 4,
@@ -864,9 +869,9 @@
         // Chair coordinate tucked in at Adamart Manager workstation facing desk
         deskPosition: { x: -3.5, z: -5.62 },
         deskRotation: 0, // Facing desk forward (+Z)
-        checkIn: '--:--',
-        checkOut: '--:--',
-        status: 'Belum Hadir',
+        checkIn: '08:18:12',
+        checkOut: '17:03:51',
+        status: 'Sudah Pulang',
         locationStr: 'Kantor Kopkar AKM (-2.176007, 115.423090)',
         color: 0x059669, // Forest Green Blazer
         topColor: 0x059669,
@@ -881,7 +886,7 @@
         shoeType: 'formal',
         shoeColor: 0x111827,
         accessory: 'lanyard',
-        currentActivity: 'Duduk di Meja Manajer Adamart',
+        currentActivity: 'Presensi Pulang (17:03)',
         targetX: -3.5, targetZ: -5.62,
         curX: -3.5, curZ: -5.62,
         heading: 0,
@@ -909,9 +914,9 @@
         // Left wall finance desk 1 chair (tucked in facing desk +X)
         deskPosition: { x: -8.02, z: 1.8 },
         deskRotation: Math.PI / 2, // Facing east (+X) into desk & screen
-        checkIn: '--:--',
-        checkOut: '--:--',
-        status: 'Belum Hadir',
+        checkIn: '07:54:24',
+        checkOut: '--:--:--',
+        status: 'Hadir',
         locationStr: 'Kantor Kopkar AKM (-2.176007, 115.423090)',
         color: 0x6366f1, // Indigo / Modern Violet
         topColor: 0x6366f1,
@@ -952,9 +957,9 @@
         // Left wall finance desk 2 chair (tucked in facing desk +X)
         deskPosition: { x: -8.02, z: 4.4 },
         deskRotation: Math.PI / 2, // Facing east (+X) into desk & screen
-        checkIn: '--:--',
-        checkOut: '--:--',
-        status: 'Belum Hadir',
+        checkIn: '08:13:47',
+        checkOut: '17:05:11',
+        status: 'Sudah Pulang',
         locationStr: 'Kantor Kopkar AKM (-2.176007, 115.423090)',
         color: 0x8b5cf6, // Violet
         topColor: 0x8b5cf6,
@@ -967,7 +972,7 @@
         shoeType: 'formal',
         shoeColor: 0x0f172a,
         accessory: 'lanyard',
-        currentActivity: 'Duduk di Meja Keuangan (Mbak Rika)',
+        currentActivity: 'Presensi Pulang (17:05)',
         targetX: -8.02, targetZ: 4.4,
         curX: -8.02, curZ: 4.4,
         heading: Math.PI / 2,
@@ -995,9 +1000,9 @@
         // Tour & Travel Consultation desk chair (tucked in facing desk -Z)
         deskPosition: { x: -3.5, z: 4.22 },
         deskRotation: Math.PI, // Facing north (-Z) into desk & screen
-        checkIn: '--:--',
-        checkOut: '--:--',
-        status: 'Belum Hadir',
+        checkIn: '08:16:56',
+        checkOut: '--:--:--',
+        status: 'Hadir',
         locationStr: 'Kantor Kopkar AKM (-2.176007, 115.423090)',
         color: 0x06b6d4, // Cyan / Turquoise Travel Theme
         topColor: 0x06b6d4,
@@ -1036,9 +1041,9 @@
         // Cashier chair tucked in facing store counter & POS register (-X)
         deskPosition: { x: 6.12, z: -4.0 },
         deskRotation: -Math.PI / 2,
-        checkIn: '--:--',
-        checkOut: '--:--',
-        status: 'Belum Hadir',
+        checkIn: '08:00:00',
+        checkOut: '17:00:00',
+        status: 'Hadir',
         locationStr: 'Store Adamart 73 (-2.176007, 115.423090)',
         color: 0xe11d48, // Red / Minimarket Uniform
         topColor: 0xe11d48,
@@ -1078,9 +1083,9 @@
         // Cashier chair tucked in facing store counter & POS register (-X)
         deskPosition: { x: 6.12, z: 3.5 },
         deskRotation: -Math.PI / 2,
-        checkIn: '--:--',
-        checkOut: '--:--',
-        status: 'Belum Hadir',
+        checkIn: '06:00:00',
+        checkOut: '14:00:00',
+        status: 'Hadir',
         locationStr: 'Store Adamart Kelanis (-2.176007, 115.423090)',
         color: 0xd97706, // Amber Gold Minimarket Uniform
         topColor: 0xd97706,
@@ -2450,14 +2455,14 @@
         ctx.fillText(staff.unit, 190, yPos);
 
         ctx.fillStyle = isHadir ? '#22c55e' : (isPulang ? '#f59e0b' : '#94a3b8');
-        ctx.font = 'bold 12px monospace';
         let timeStr = 'Belum';
         if (isPulang) {
-          timeStr = `Out ${staff.checkOut.substring(0, 5)}`;
+          const inPart = (staff.checkIn && staff.checkIn !== '--:--' && staff.checkIn !== '--:--:--') ? `In ${staff.checkIn.substring(0, 5)} · ` : '';
+          timeStr = `${inPart}Out ${staff.checkOut.substring(0, 5)}`;
         } else if (isHadir) {
           timeStr = `In ${staff.checkIn.substring(0, 5)}`;
         }
-        ctx.fillText(timeStr, 385, yPos);
+        ctx.fillText(timeStr, 350, yPos);
 
         yPos += 38;
       });
@@ -2988,13 +2993,12 @@
         });
       }
 
-      // 3. Selaraskan balon nama karakter di atas kepala (CSS2D)
+      // 3. Balon nama karakter & jam hadir/pulang di atas kepala (CSS2D) SELALU TAMPIL
       if (typeof STAFF_ROSTER !== 'undefined') {
         STAFF_ROSTER.forEach(s => {
           if (s.hud) {
-            // Pada mode Papan Nama 3D: ruangan bersih, nama cukup terbaca di plakat 3D meja
-            // Pada mode Label 2D On: balon nama melayang di atas kepala aktif
-            s.hud.visible = areDeskTagsEnabled && s.status === 'Hadir' && s.mesh && s.mesh.visible;
+            // Selalu tampil di atas kepala untuk setiap staf yang mesh karakternya aktif di ruangan
+            s.hud.visible = !!(s.mesh && s.mesh.visible);
           }
         });
       }
@@ -3344,7 +3348,8 @@
         charMesh.position.set(staff.curX, 0, staff.curZ);
         charMesh.rotation.y = staff.heading;
         
-        charMesh.visible = false;
+        const isInitiallyActive = (staff.status === 'Hadir' || staff.status === 'Sudah Pulang');
+        charMesh.visible = isInitiallyActive;
         scene.add(charMesh);
         staff.mesh = charMesh;
 
@@ -3353,12 +3358,15 @@
         hudDiv.id = `hud-${staff.id}`;
         hudDiv.innerHTML = `
           <div class="hud-bubble-action">
-            <span class="w-1.5 h-1.5 rounded-full ${staff.status === 'Hadir' ? 'bg-emerald-400' : 'bg-rose-400'}"></span>
+            <span class="w-1.5 h-1.5 rounded-full ${staff.status === 'Hadir' ? 'bg-emerald-400' : 'bg-amber-400'}"></span>
             <span class="activity-text">${staff.currentActivity}</span>
           </div>
           <div class="hud-bubble-name">
-            <span class="font-bold text-white text-xs">${staff.name}</span>
-            <span class="checkin-badge text-[10px] ${staff.status === 'Hadir' ? 'text-emerald-400 font-bold' : 'text-slate-400'} font-mono">${staff.checkIn}</span>
+            <div class="flex items-center gap-1">
+              <span class="hud-status-dot w-1.5 h-1.5 rounded-full ${staff.status === 'Hadir' ? 'bg-emerald-400 pulse-dot shadow-[0_0_6px_rgba(52,211,153,0.8)]' : (staff.status === 'Sudah Pulang' ? 'bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.6)]' : 'bg-slate-500')} shrink-0"></span>
+              <span class="staff-head-name font-bold text-white text-[10.5px] tracking-tight">${staff.name}</span>
+            </div>
+            <div class="checkin-badge flex items-center gap-1 font-mono"></div>
           </div>
         `;
         hudDiv.onclick = (e) => {
@@ -3367,12 +3375,14 @@
         };
 
         const hudObject = new THREE.CSS2DObject(hudDiv);
-        hudObject.position.set(0, 2.2, 0);
-        hudObject.visible = false;
+        hudObject.position.set(0, 2.38, 0);
+        hudObject.visible = isInitiallyActive;
         charMesh.add(hudObject);
         staff.hud = hudObject;
 
         applySittingPose(charMesh, staff.deskRotation);
+
+        updateHudLabel(staff);
 
         const btn = document.createElement('button');
         btn.className = 'glass-button px-2 sm:px-2.5 py-1.5 rounded-xl flex items-center gap-2 text-xs hover:border-indigo-400 shrink-0 opacity-50';
@@ -4050,24 +4060,70 @@
       });
     }
 
+    function formatTimeClean(val) {
+      if (!val || val === '--:--' || val === '--:--:--') return null;
+      const str = String(val).trim().replace(/\./g, ':');
+      const parts = str.split(':');
+      if (parts.length >= 2) {
+        const hh = parts[0].padStart(2, '0');
+        const mm = parts[1].padStart(2, '0');
+        return `${hh}:${mm}`;
+      }
+      return str;
+    }
+
     function updateHudLabel(staff) {
       const hudEl = document.getElementById(`hud-${staff.id}`);
       if (hudEl) {
-        const nameEl = hudEl.querySelector('.hud-bubble-name span.font-bold');
+        const nameEl = hudEl.querySelector('.staff-head-name') || hudEl.querySelector('.hud-bubble-name span.font-bold');
         if (nameEl) nameEl.textContent = staff.name;
+
         const actEl = hudEl.querySelector('.activity-text');
         if (actEl) actEl.textContent = staff.currentActivity;
+
+        const dotEl = hudEl.querySelector('.hud-status-dot');
+        if (dotEl) {
+          if (staff.status === 'Hadir') {
+            dotEl.className = 'hud-status-dot w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot shadow-[0_0_6px_rgba(52,211,153,0.8)] shrink-0';
+          } else if (staff.status === 'Sudah Pulang') {
+            dotEl.className = 'hud-status-dot w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.6)] shrink-0';
+          } else {
+            dotEl.className = 'hud-status-dot w-1.5 h-1.5 rounded-full bg-slate-500 shrink-0';
+          }
+        }
+
         const checkEl = hudEl.querySelector('.checkin-badge');
         if (checkEl) {
-          if (staff.status === 'Sudah Pulang') {
-            checkEl.textContent = `Out ${staff.checkOut && staff.checkOut !== '--:--' && staff.checkOut !== '--:--:--' ? staff.checkOut.substring(0, 5) : ''}`;
-            checkEl.className = 'checkin-badge text-[10px] text-amber-400 font-bold font-mono';
-          } else if (staff.status === 'Hadir') {
-            checkEl.textContent = `In ${staff.checkIn && staff.checkIn !== '--:--' && staff.checkIn !== '--:--:--' ? staff.checkIn.substring(0, 5) : ''}`;
-            checkEl.className = 'checkin-badge text-[10px] text-emerald-400 font-bold font-mono';
+          const inTime = formatTimeClean(staff.checkIn);
+          const outTime = formatTimeClean(staff.checkOut);
+
+          if (inTime && outTime) {
+            checkEl.innerHTML = `
+              <span class="inline-flex items-center gap-0.5 text-[8.5px] font-mono font-bold text-emerald-300 bg-emerald-500/20 px-1 py-0.5 rounded border border-emerald-400/30">
+                <span class="w-1 h-1 rounded-full bg-emerald-400"></span>In ${inTime}
+              </span>
+              <span class="inline-flex items-center gap-0.5 text-[8.5px] font-mono font-bold text-amber-300 bg-amber-500/20 px-1 py-0.5 rounded border border-amber-400/30">
+                <span class="w-1 h-1 rounded-full bg-amber-400"></span>Out ${outTime}
+              </span>
+            `;
+          } else if (outTime) {
+            checkEl.innerHTML = `
+              <span class="inline-flex items-center gap-0.5 text-[8.5px] font-mono font-bold text-amber-300 bg-amber-500/20 px-1 py-0.5 rounded border border-amber-400/30">
+                <span class="w-1 h-1 rounded-full bg-amber-400"></span>Out ${outTime}
+              </span>
+            `;
+          } else if (inTime) {
+            checkEl.innerHTML = `
+              <span class="inline-flex items-center gap-0.5 text-[8.5px] font-mono font-bold text-emerald-300 bg-emerald-500/20 px-1 py-0.5 rounded border border-emerald-400/30">
+                <span class="w-1 h-1 rounded-full bg-emerald-400 pulse-dot"></span>In ${inTime}
+              </span>
+            `;
           } else {
-            checkEl.textContent = 'Belum';
-            checkEl.className = 'checkin-badge text-[10px] text-slate-400 font-mono';
+            checkEl.innerHTML = `
+              <span class="text-[8px] font-mono text-slate-400 bg-slate-800/80 px-1 py-0.5 rounded border border-white/5">
+                Belum Hadir
+              </span>
+            `;
           }
         }
       }
