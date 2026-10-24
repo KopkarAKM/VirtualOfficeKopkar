@@ -244,31 +244,30 @@
     .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(129, 140, 248, 0.6); }
     * { scrollbar-width: thin; scrollbar-color: rgba(148, 163, 184, 0.35) transparent; }
 
-    @media (max-width: 640px) {
-      .hud-label {
-        transform: translate(-50%, -100%) scale(0.60);
-      }
-      .hud-label:hover {
-        transform: translate(-50%, -100%) scale(0.72);
-      }
-      .hud-bubble-action {
-        display: none !important; /* Sembunyikan kalimat aktivitas panjang di layar HP agar tidak tabrakan/menumpuk */
-      }
-      .hud-bubble-name {
-        font-size: 9.5px;
-        padding: 1.5px 6px;
-        border-radius: 9999px;
-        background: rgba(15, 23, 42, 0.94);
-        border: 1px solid rgba(255, 255, 255, 0.20);
-        gap: 3.5px;
+    @media (max-width: 768px) {
+      /* Mode Layar HP: Sembunyikan tumpukan balon nama melayang secara default agar tidak saling menutupi NPC & ruangan */
+      .hud-label:not(.active-selected) {
+        display: none !important;
       }
       .hud-tag-desk {
-        font-size: 9.5px !important;
-        padding: 2.5px 7px !important;
-        gap: 4px !important;
-        border-width: 1px !important;
-        opacity: 0.95 !important;
-        transform: translate(-50%, -100%) scale(0.92);
+        display: none !important;
+      }
+      .hud-label.active-selected {
+        display: flex !important;
+        transform: translate(-50%, -100%) scale(0.80);
+        z-index: 60;
+      }
+      .hud-label.active-selected .hud-bubble-action {
+        display: flex !important;
+      }
+      .hud-bubble-name {
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 9999px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        gap: 4px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       }
     }
   </style>
@@ -329,7 +328,7 @@
             <i class="ph ph-crosshair text-indigo-400"></i>
           </div>
           <div class="space-y-0.5">
-            <button onclick="selectPreset('overview', 'Overview (Semua)')" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs text-slate-200 hover:bg-indigo-600/30 hover:text-white flex items-center gap-2 transition-all">
+<button onclick="selectPreset('overview', 'Overview (Semua)')" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs text-slate-200 hover:bg-indigo-600/30 hover:text-white flex items-center gap-2 transition-all">
               <i class="ph ph-buildings text-indigo-400"></i> <span>Overview (Semua)</span>
             </button>
             <button onclick="selectPreset('manager-kop', 'Pak Fedrik')" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs text-slate-200 hover:bg-indigo-600/30 hover:text-white flex items-center gap-2 transition-all">
@@ -4406,82 +4405,119 @@
       }
     }
 
+    function showKaraSpeechBalloon() {
+      const balloon = document.getElementById('kara-speech-balloon');
+      if (balloon) {
+        balloon.classList.remove('hidden', 'opacity-0', 'pointer-events-none', 'scale-90');
+        balloon.classList.add('opacity-100', 'pointer-events-auto', 'scale-100');
+      }
+      if (typeof triggerKaraGreeting === 'function') {
+        triggerKaraGreeting('show');
+      }
+    }
+
+    function hideKaraSpeechBalloon() {
+      const balloon = document.getElementById('kara-speech-balloon');
+      if (balloon) {
+        balloon.classList.remove('opacity-100', 'pointer-events-auto', 'scale-100');
+        balloon.classList.add('opacity-0', 'pointer-events-none', 'scale-90');
+        setTimeout(() => {
+          if (balloon && balloon.classList.contains('opacity-0')) {
+            balloon.classList.add('hidden');
+          }
+        }, 300);
+      }
+    }
+
     function createKaraSpeechBalloon() {
       const container = document.createElement('div');
       container.id = 'kara-speech-container';
-      container.className = 'select-none pointer-events-auto cursor-pointer';
+      container.className = 'select-none pointer-events-auto';
 
       container.innerHTML = `
-        <div id="kara-speech-balloon" class="relative group transition-all duration-300 transform hover:scale-105" onclick="triggerKaraGreeting('balloon'); setTimeout(() => openReceptionModal(), 350);">
+        <div id="kara-speech-balloon" class="hidden opacity-0 pointer-events-none scale-90 transition-all duration-300 relative group w-[235px] sm:w-[265px]">
           <!-- Glow backdrop -->
-          <div class="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-emerald-500/30 rounded-2xl blur-sm opacity-75 group-hover:opacity-100 transition duration-300"></div>
+          <div class="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-emerald-500/30 rounded-2xl blur-sm opacity-70 group-hover:opacity-100 transition duration-300 pointer-events-none"></div>
           
           <!-- Card body -->
-          <div class="relative bg-slate-900/95 backdrop-blur-md border border-teal-500/40 rounded-2xl p-2.5 shadow-2xl max-w-[275px]">
-            <!-- Header: Avatar + Name + Origin Tag -->
-            <div class="flex items-center gap-2 mb-1.5 pb-1 border-b border-teal-500/20">
-              <div class="relative">
-                <div class="w-7 h-7 rounded-full bg-teal-600 flex items-center justify-center text-xs text-white font-bold ring-2 ring-teal-400">
-                  🌸
+          <div class="relative bg-slate-900/95 backdrop-blur-md border border-teal-500/40 rounded-2xl p-2 sm:p-2.5 shadow-2xl">
+            <!-- Header: Avatar + Name + Close Button -->
+            <div class="flex items-center justify-between pb-1.5 border-b border-teal-500/20">
+              <div class="flex items-center gap-2">
+                <div class="relative">
+                  <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-teal-600 flex items-center justify-center text-xs text-white font-bold ring-2 ring-teal-400">
+                    🌸
+                  </div>
+                  <span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-1 ring-slate-900 animate-ping"></span>
+                  <span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-1 ring-slate-900"></span>
                 </div>
-                <span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-1 ring-slate-900 animate-ping"></span>
-                <span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-1 ring-slate-900"></span>
-              </div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-1.5">
-                  <h4 class="text-xs font-bold text-white tracking-wide truncate">Mbak Kara</h4>
-                  <span class="text-[8.5px] font-semibold text-teal-300 bg-teal-950/80 px-1 py-0.2 rounded border border-teal-500/30" title="Kopkar Adaro kArya mandiri">Kopkar AKM</span>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1">
+                    <h4 class="text-xs font-bold text-white tracking-wide truncate">Mbak Kara</h4>
+                    <span class="text-[8px] font-semibold text-teal-300 bg-teal-950/80 px-1 py-0.2 rounded border border-teal-500/30" title="Kopkar Adaro kArya mandiri">AKM</span>
+                  </div>
+                  <p class="text-[8.5px] text-teal-200/80 leading-none">Sekretaris & Resepsionis</p>
                 </div>
-                <p class="text-[9px] text-teal-200/80 leading-none">Sekretaris & Resepsionis</p>
               </div>
-              <div class="text-teal-400 text-xs animate-bounce" title="Klik untuk berinteraksi">💬</div>
+              <!-- Close Button -->
+              <button onclick="event.stopPropagation(); hideKaraSpeechBalloon();" class="w-5 h-5 rounded-full bg-white/10 hover:bg-rose-500/50 text-slate-300 hover:text-white flex items-center justify-center text-[10px] font-bold cursor-pointer transition-colors shrink-0" title="Tutup Dialog">
+                ✕
+              </button>
             </div>
 
             <!-- Speech text with animated cycling -->
-            <p id="kara-dialog-text" class="text-[11px] text-slate-100 leading-snug font-medium transition-all duration-300">
-              Halo! Saya Mbak Kara (Kopkar AKM), ada yang bisa saya bantu seputar layanan koperasi? 😊
+            <p id="kara-dialog-text" class="text-[10px] sm:text-[11px] text-slate-100 leading-snug font-medium transition-all duration-300 my-1.5">
+              Halo! Saya Mbak Kara, senang menyapa Bapak/Ibu. Silakan pilih layanan koperasi kami! 🌸
             </p>
 
             <!-- Quick action pills -->
-            <div class="mt-2 flex items-center gap-1 pt-1.5 border-t border-slate-800" onclick="event.stopPropagation();">
-              <button onclick="triggerKaraGreeting('info'); openReceptionModal('profil')" class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-teal-500/20 text-teal-300 hover:bg-teal-500 hover:text-white transition-colors border border-teal-500/30 flex items-center gap-1">
+            <div class="grid grid-cols-2 gap-1 pt-1.5 border-t border-slate-800" onclick="event.stopPropagation();">
+              <button onclick="triggerKaraGreeting('info'); openReceptionModal('profil')" class="px-1.5 py-1 rounded-lg text-[9px] font-semibold bg-teal-500/20 text-teal-300 hover:bg-teal-500 hover:text-white transition-colors border border-teal-500/30 flex items-center justify-center gap-1 cursor-pointer">
                 <span>🏛️</span> Profil
               </button>
-              <button onclick="triggerKaraGreeting('anggota'); openReceptionModal('anggota')" class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500 hover:text-white transition-colors border border-indigo-500/30 flex items-center gap-1">
+              <button onclick="triggerKaraGreeting('anggota'); openReceptionModal('anggota')" class="px-1.5 py-1 rounded-lg text-[9px] font-semibold bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500 hover:text-white transition-colors border border-indigo-500/30 flex items-center justify-center gap-1 cursor-pointer">
                 <span>📝</span> Anggota
               </button>
-              <button onclick="triggerKaraGreeting('adamart'); openReceptionModal('adamart')" class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-rose-500/20 text-rose-300 hover:bg-rose-500 hover:text-white transition-colors border border-rose-500/30 flex items-center gap-1">
+              <button onclick="triggerKaraGreeting('adamart'); openReceptionModal('adamart')" class="px-1.5 py-1 rounded-lg text-[9px] font-semibold bg-rose-500/20 text-rose-300 hover:bg-rose-500 hover:text-white transition-colors border border-rose-500/30 flex items-center justify-center gap-1 cursor-pointer">
                 <span>🛒</span> Adamart
               </button>
-              <button onclick="triggerKaraGreeting('kontak'); openReceptionModal('kontak')" class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-white transition-colors border border-emerald-500/30 flex items-center gap-1">
+              <button onclick="triggerKaraGreeting('kontak'); openReceptionModal('kontak')" class="px-1.5 py-1 rounded-lg text-[9px] font-semibold bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-white transition-colors border border-emerald-500/30 flex items-center justify-center gap-1 cursor-pointer">
                 <span>📞</span> Kontak
               </button>
             </div>
 
+            <!-- Primary Action Button: Buku Tamu & Layanan -->
+            <button onclick="event.stopPropagation(); triggerKaraGreeting('modal'); openReceptionModal();" class="w-full mt-1.5 py-1 px-2 rounded-lg text-[9px] sm:text-[9.5px] font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white shadow flex items-center justify-center gap-1 transition-all cursor-pointer">
+              <span>📖</span> Buka Buku Tamu & Layanan
+            </button>
+
             <!-- Pointer Triangle at bottom -->
-            <div class="absolute -bottom-1.5 left-8 w-3 h-3 bg-slate-900/95 border-r border-b border-teal-500/40 transform rotate-45"></div>
+            <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-900/95 border-r border-b border-teal-500/40 transform rotate-45"></div>
           </div>
         </div>
       `;
 
-      // Cycle friendly messages every 8.5 seconds
+      // Cycle friendly messages every 8.5 seconds (only when balloon is visible)
       const messages = [
         "Halo! Selamat datang di Sentra Virtual Kopkar Adaro Karya Mandiri 🌸",
         "Saya Mbak Kara, singkatan ramah dari Kopkar Adaro kArya mandiri. Senang bertemu Anda! 😊",
-        "Butuh info Simpan Pinjam, SHU, atau saldo Armadillo? Klik saya ya!",
+        "Butuh info Simpan Pinjam, SHU, atau saldo Armadillo? Klik pilihan layanan ya!",
         "Mau belanja kebutuhan site di Toko Adamart 73 & Kelanis? Cek katalognya!",
         "Punya pertanyaan seputar keanggotaan? Hubungi Kara via WhatsApp 💬"
       ];
       let msgIdx = 0;
       setInterval(() => {
-        const d = document.getElementById('kara-dialog-text');
-        if (d && (!window.mbakKaraAvatar || window.mbakKaraAvatar.nodTimer <= 0)) {
-          msgIdx = (msgIdx + 1) % messages.length;
-          d.style.opacity = '0';
-          setTimeout(() => {
-            d.innerHTML = messages[msgIdx];
-            d.style.opacity = '1';
-          }, 300);
+        const balloon = document.getElementById('kara-speech-balloon');
+        if (balloon && !balloon.classList.contains('hidden') && !balloon.classList.contains('opacity-0')) {
+          const d = document.getElementById('kara-dialog-text');
+          if (d && (!window.mbakKaraAvatar || window.mbakKaraAvatar.nodTimer <= 0)) {
+            msgIdx = (msgIdx + 1) % messages.length;
+            d.style.opacity = '0';
+            setTimeout(() => {
+              d.innerHTML = messages[msgIdx];
+              d.style.opacity = '1';
+            }, 300);
+          }
         }
       }, 8500);
 
@@ -5110,13 +5146,23 @@
       karaAvatar.group.position.set(0, 0.05, -0.65);
       g.add(karaAvatar.group);
 
-      // Register interactive meshes for raycaster click
+      // Register interactive meshes for raycaster click (Avatar, Kursi, Meja, Counter)
       karaAvatar.group.traverse(child => {
         if (child.isMesh) {
           child.userData.isReceptionClickable = true;
           INTERACTIVE_RECEPTION_MESHES.push(child);
         }
       });
+      chair.traverse(child => {
+        if (child.isMesh) {
+          child.userData.isReceptionClickable = true;
+          INTERACTIVE_RECEPTION_MESHES.push(child);
+        }
+      });
+      counterBase.userData.isReceptionClickable = true;
+      INTERACTIVE_RECEPTION_MESHES.push(counterBase);
+      counterTop.userData.isReceptionClickable = true;
+      INTERACTIVE_RECEPTION_MESHES.push(counterTop);
 
       // 3. Physical 3D Desk Nameplate: "MBAK KARA - SEKRETARIS & RESEPSIONIS"
       const nameplateRec = createDeskNameplate3D({
@@ -5127,8 +5173,10 @@
         theme: 'emerald',
         targetFocus: { x: -10.2, y: 1.15, z: -1.0 },
         onClick: () => {
+          closeDetailCard();
+          focusPreset('reception', 'Resepsionis');
+          if (typeof showKaraSpeechBalloon === 'function') showKaraSpeechBalloon();
           triggerKaraGreeting('nameplate');
-          setTimeout(() => openReceptionModal(), 350);
         }
       });
       nameplateRec.position.set(-0.7, 1.16, 0.26);
@@ -5461,6 +5509,26 @@
     function spawnStaffAvatars() {
       const staffDock = document.getElementById('staff-dock');
       staffDock.innerHTML = '';
+
+      // 1. Mbak Kara (Sekretaris & Resepsionis) Dock Item
+      const karaDockBtn = document.createElement('button');
+      karaDockBtn.className = 'glass-button px-2 sm:px-2.5 py-1.5 rounded-xl flex items-center gap-2 text-xs hover:border-teal-400 shrink-0 border-teal-500/40 bg-teal-950/40 cursor-pointer';
+      karaDockBtn.id = 'dock-btn-kara';
+      karaDockBtn.onclick = (e) => {
+        if (e) e.stopPropagation();
+        closeDetailCard();
+        selectPreset('reception', 'Resepsionis');
+      };
+      karaDockBtn.innerHTML = `
+        <span class="w-6 h-6 rounded-lg bg-teal-800 border-teal-500 border flex items-center justify-center text-xs shrink-0 shadow">
+          🌸
+        </span>
+        <div class="text-left">
+          <p class="font-bold text-teal-200 text-[11px] leading-tight">Mbak Kara</p>
+          <p class="text-[9px] text-teal-300 font-mono">Sekretaris & Resepsionis</p>
+        </div>
+      `;
+      staffDock.appendChild(karaDockBtn);
 
       STAFF_ROSTER.forEach((staff) => {
         const charMesh = buildCharacterMesh(staff);
@@ -6447,6 +6515,7 @@
           targetEl.closest('header') || 
           targetEl.closest('footer') || 
           targetEl.closest('.glass-panel') ||
+          targetEl.closest('#modal-video-cinema') ||
           targetEl.closest('#modal-digital-reception') ||
           targetEl.closest('#modal-signboard') ||
           targetEl.closest('#modal-adamart-store') ||
@@ -6499,17 +6568,18 @@
           }
         }
 
-                // 1b. Check interactive Digital Reception & Member Service (Mbak Kara, Kiosk, Banner)
+                // 1b. Check interactive Digital Reception & Member Service (Mbak Kara, Kursi, Meja)
         if (typeof INTERACTIVE_RECEPTION_MESHES !== 'undefined' && INTERACTIVE_RECEPTION_MESHES.length > 0) {
           const recIntersects = raycaster.intersectObjects(INTERACTIVE_RECEPTION_MESHES, true);
           if (recIntersects.length > 0) {
+            closeDetailCard();
             focusPreset('reception', 'Resepsionis');
+            if (typeof showKaraSpeechBalloon === 'function') {
+              showKaraSpeechBalloon();
+            }
             if (typeof triggerKaraGreeting === 'function') {
               triggerKaraGreeting('click');
             }
-            setTimeout(() => {
-              openReceptionModal();
-            }, 350);
             return true;
           }
         }
@@ -6691,6 +6761,18 @@
     }
 
     function selectStaff(staff) {
+      // Sembunyikan balon Mbak Kara saat memilih meja staf lain
+      if (typeof hideKaraSpeechBalloon === 'function') {
+        hideKaraSpeechBalloon();
+      }
+
+      // Tandai HANYA staf ini yang aktif di layar HP
+      document.querySelectorAll('.hud-label').forEach(el => el.classList.remove('active-selected'));
+      const activeHud = document.getElementById(`hud-${staff.id}`);
+      if (activeHud) {
+        activeHud.classList.add('active-selected');
+      }
+
       selectedStaff = staff;
 
       // Update background watermark photo
@@ -6809,6 +6891,8 @@
       card.classList.add('translate-y-[120%]', 'sm:translate-x-[450px]', 'opacity-0', 'pointer-events-none');
       card.classList.remove('translate-y-0', 'sm:translate-x-0', 'opacity-100', 'pointer-events-auto');
       closeStaffPhotoModal();
+      document.querySelectorAll('.hud-label').forEach(el => el.classList.remove('active-selected'));
+      document.querySelectorAll('#staff-dock button').forEach(b => b.classList.remove('border-indigo-400', 'bg-indigo-600/30', 'border-teal-400', 'bg-teal-600/30'));
       selectedStaff = null;
     }
 
@@ -6889,6 +6973,13 @@
       const icon = document.getElementById('icon-camera-dropdown');
       if (icon) icon.classList.remove('rotate-180');
       
+      // Update dock highlight
+      document.querySelectorAll('#staff-dock button').forEach(b => b.classList.remove('border-indigo-400', 'bg-indigo-600/30', 'border-teal-400', 'bg-teal-600/30'));
+      if (presetKey === 'reception') {
+        const karaBtn = document.getElementById('dock-btn-kara');
+        if (karaBtn) karaBtn.classList.add('border-teal-400', 'bg-teal-600/30');
+      }
+
       focusPreset(presetKey);
     }
 
@@ -7118,6 +7209,20 @@
       const activeBtn = document.getElementById(`btn-cam-${presetKey}`);
       if (activeBtn) activeBtn.classList.add('active');
 
+      if (presetKey === 'reception') {
+        if (typeof showKaraSpeechBalloon === 'function') {
+          showKaraSpeechBalloon();
+        }
+      } else {
+        if (typeof hideKaraSpeechBalloon === 'function') {
+          hideKaraSpeechBalloon();
+        }
+      }
+
+      if (presetKey === 'overview') {
+        document.querySelectorAll('.hud-label').forEach(el => el.classList.remove('active-selected'));
+      }
+
       const isMobile = window.innerWidth < 768;
       const camY = isMobile ? 1.55 : 1.45;
       const targetY = isMobile ? 1.25 : 1.18;
@@ -7151,6 +7256,11 @@
 
 
     function resetCamera() {
+      closeDetailCard();
+      if (typeof hideKaraSpeechBalloon === 'function') {
+        hideKaraSpeechBalloon();
+      }
+      document.querySelectorAll('.hud-label').forEach(el => el.classList.remove('active-selected'));
       focusPreset('overview');
     }
 
@@ -7699,6 +7809,23 @@
     /* =====================================================================
        DIGITAL RECEPTION & MEMBER SERVICE CONTROLLER
        ===================================================================== */
+        /* =====================================================================
+       HYPERFRAMES CINEMA VIDEO MODAL CONTROLLER
+       ===================================================================== */
+    function openVideoCinemaModal() {
+      const m = document.getElementById('modal-video-cinema');
+      if (!m) return;
+      m.classList.remove('hidden');
+      if (typeof gtag === 'function') {
+        gtag('event', 'open_video_cinema', { event_category: 'Media', video_title: 'Keseharian dan Layanan Kopkar AKM' });
+      }
+    }
+
+    function closeVideoCinemaModal() {
+      const m = document.getElementById('modal-video-cinema');
+      if (m) m.classList.add('hidden');
+    }
+
     function openReceptionModal(initialTab = 'profil') {
       const m = document.getElementById('modal-digital-reception');
       if (!m) return;
@@ -7743,11 +7870,550 @@
       }
     });
 
+  
+    /* =====================================================================
+       8. 3D CINEMATIC TOUR & NATIVE IN-BROWSER RECORDER ENGINE
+       ===================================================================== */
+    let isCinematicTourActive = false;
+    let tourRecordMode = false;
+    let tourMediaRecorder = null;
+    let tourRecordedChunks = [];
+    let tourTimeline = null;
+    let tourCurrentSceneIndex = 0;
+    let tourTimerInterval = null;
+    let tourSecondsElapsed = 0;
+    const TOTAL_TOUR_DURATION = 40; // 40 seconds total cinematic experience
+
+    const TOUR_SCENES = [
+      {
+        id: 'overview',
+        duration: 6.5,
+        name: 'Panorama Virtual Office',
+        cam: { x: -16.0, y: 13.5, z: 15.5 },
+        target: { x: -1.5, y: 1.0, z: 0.5 },
+        badge: 'SELAMAT DATANG',
+        badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+        stripeColor: 'from-emerald-400 via-teal-400 to-cyan-400',
+        title: 'Sentra Virtual Office Kopkar AKM',
+        subtitle: 'Pusat Pelayanan Terpadu Anggota Koperasi Karyawan PT Adaro Indonesia & Mitra Kerja.',
+        chips: ['Badan Hukum No. 2128/BH/IX', 'Berdiri Sejak 1999', 'Melayani Site Km 73 & Kelanis'],
+        onEnter: () => {
+          if (typeof playKaraChime === 'function') playKaraChime();
+        }
+      },
+      {
+        id: 'reception',
+        duration: 7.5,
+        name: 'Front Desk & Mbak Kara',
+        cam: { x: -7.5, y: 1.48, z: -1.0 },
+        target: { x: -10.2, y: 1.18, z: -1.0 },
+        badge: 'FRONT DESK & ASISTEN VIRTUAL',
+        badgeColor: 'bg-teal-500/20 text-teal-300 border-teal-500/40',
+        stripeColor: 'from-teal-400 via-cyan-400 to-sky-400',
+        title: 'Mbak Kara (Kopkar Adaro kArya mandiri)',
+        subtitle: 'Asisten Virtual Cerdas & Ramah, Siap Melayani Informasi, Registrasi, & Buku Tamu Digital.',
+        chips: ['Singkatan Ramah Resmi', 'AI Interaktif & Percakapan', 'Buku Tamu Digital'],
+        onEnter: () => {
+          // Trigger live greeting: smile, courteous double nod, wave hand, open speech bubble
+          if (typeof triggerKaraGreeting === 'function') {
+            triggerKaraGreeting('tour');
+          }
+          if (window.mbakKaraAvatar) {
+            window.mbakKaraAvatar.waveTimer = 4.5;
+            window.mbakKaraAvatar.nodTimer = 1.4;
+            window.mbakKaraAvatar.targetSmile = 1.0;
+          }
+          const balloon = document.getElementById('kara-speech-balloon');
+          if (balloon) {
+            balloon.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-2');
+            balloon.classList.add('opacity-100', 'translate-y-0');
+            const txt = document.getElementById('kara-speech-text');
+            if (txt) txt.innerText = "Halo! Selamat datang di Kopkar AKM. Saya Mbak Kara, senang menyapa Bapak/Ibu sekalian!";
+          }
+        }
+      },
+      {
+        id: 'pengurus',
+        duration: 7.0,
+        name: 'Galeri Pengelola & Command Center',
+        cam: { x: -8.65, y: 3.65, z: -4.0 },
+        target: { x: -8.65, y: 3.65, z: -8.95 },
+        badge: 'STRUKTUR PENGELOLA RESMI',
+        badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+        stripeColor: 'from-amber-400 via-orange-400 to-yellow-400',
+        title: 'Pengelola Koperasi Masa Bakti Aktif',
+        subtitle: 'Dipimpin oleh Jajaran Pengurus & Manajemen Profesional Berdedikasi Penuh.',
+        chips: [
+          'Manajer: Fedrik Christian Adi Candra',
+          'Admin & Adamart: Mahmudah Hayati',
+          'Keuangan: Sri Mulyana',
+          'Simpan Pinjam: Rika Norhidayati',
+          'Travel: Zahrah Annisa'
+        ],
+        onEnter: () => {
+          // Close Kara speech balloon gently
+          const balloon = document.getElementById('kara-speech-balloon');
+          if (balloon) {
+            balloon.classList.add('opacity-0', 'pointer-events-none', '-translate-y-2');
+            balloon.classList.remove('opacity-100', 'translate-y-0');
+          }
+        }
+      },
+      {
+        id: 'adamart',
+        duration: 7.0,
+        name: 'Toko Ritel Adamart Km 73 & Kelanis',
+        cam: { x: 3.2, y: 1.55, z: -3.8 },
+        target: { x: 5.7, y: 1.18, z: -4.0 },
+        badge: 'UNIT BISNIS RITEL',
+        badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
+        stripeColor: 'from-rose-400 via-pink-400 to-orange-400',
+        title: 'Toko Adamart Km 73 & Kelanis',
+        subtitle: 'Pusat Belanja Sembako, Kebutuhan Pokok Harian, Makanan & Minuman Segar Karyawan Site.',
+        chips: ['Kasir Km 73: Muhammad Sahap', 'Kasir Kelanis: Siti Azimah', 'Kemudahan Potong Gaji & Cashless'],
+        onEnter: () => {}
+      },
+      {
+        id: 'layanan',
+        duration: 6.5,
+        name: 'Unit Simpan Pinjam & Pembiayaan Wisata',
+        cam: { x: -4.7, y: 1.55, z: 2.8 },
+        target: { x: -7.2, y: 1.25, z: 2.8 },
+        badge: 'LAYANAN UNGGULAN ANGGOTA',
+        badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/40',
+        stripeColor: 'from-blue-400 via-indigo-400 to-cyan-400',
+        title: 'Unit Simpan Pinjam & Wisata / Travel',
+        subtitle: 'Solusi Finansial Fleksibel, Amanah, Transparan, serta Paket Perjalanan Wisata Terencana.',
+        chips: ['Pinjaman Reguler, Multiguna & Darurat', 'Paket Umroh & Liburan', 'SHU Tahunan Menguntungkan'],
+        onEnter: () => {}
+      },
+      {
+        id: 'digital',
+        duration: 5.5,
+        name: 'Kopkar AKM Connect & Grand Outro',
+        cam: { x: -16.0, y: 16.0, z: 17.0 },
+        target: { x: 0.0, y: 0.8, z: 0.0 },
+        badge: 'KEMUDAHAN DIGITAL 24/7',
+        badgeColor: 'bg-violet-500/20 text-violet-300 border-violet-500/40',
+        stripeColor: 'from-violet-400 via-purple-400 to-pink-400',
+        title: 'Aplikasi Armadillo & Kopkar AKM Connect',
+        subtitle: 'Pantau Saldo Simpanan, Tagihan Bulanan, & Unduh Layanan Kapan Saja dari Smartphone Anda.',
+        chips: ['akm.seduloer.com', 'kopkarakm.github.io/Kopkar-AKM-Connect', 'WA Center: 0811-501-144'],
+        onEnter: () => {}
+      }
+    ];
+
+    function formatTimecode(secs) {
+      const m = Math.floor(secs / 60).toString().padStart(2, '0');
+      const s = Math.floor(secs % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function updateTourLowerThird(scene) {
+      const badge = document.getElementById('lower-third-badge');
+      const stripe = document.getElementById('lower-third-stripe');
+      const title = document.getElementById('lower-third-title');
+      const subtitle = document.getElementById('lower-third-subtitle');
+      const chips = document.getElementById('lower-third-chips');
+      const sceneTitle = document.getElementById('tour-scene-title');
+      const ltContainer = document.getElementById('tour-lower-third');
+
+      if (!ltContainer) return;
+
+      // Animate out gently
+      gsap.to(ltContainer, {
+        opacity: 0,
+        y: 12,
+        duration: 0.25,
+        onComplete: () => {
+          if (badge) {
+            badge.className = `px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-extrabold uppercase tracking-wider border ${scene.badgeColor}`;
+            badge.innerText = scene.badge;
+          }
+          if (stripe) {
+            stripe.className = `absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${scene.stripeColor}`;
+          }
+          if (title) title.innerText = scene.title;
+          if (subtitle) subtitle.innerText = scene.subtitle;
+          if (sceneTitle) sceneTitle.innerText = scene.name;
+
+          if (chips) {
+            chips.innerHTML = scene.chips
+              .map(c => `<span class="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 font-medium">${c}</span>`)
+              .join('');
+          }
+
+          // Animate back in
+          gsap.to(ltContainer, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
+        }
+      });
+    }
+
+    function startCinematicTour(recordMode = false) {
+      if (isCinematicTourActive) return;
+
+      isCinematicTourActive = true;
+      tourRecordMode = recordMode;
+      tourCurrentSceneIndex = 0;
+      tourSecondsElapsed = 0;
+
+      // Close open modals
+      closeVideoCinemaModal();
+      closeReceptionModal();
+      const menu = document.getElementById('menu-camera-dropdown');
+      if (menu) menu.classList.add('hidden');
+
+      // Disable orbit controls so user drag does not fight camera tween
+      if (controls) controls.enabled = false;
+
+      // Show Tour Overlay UI
+      const overlay = document.getElementById('cinematic-tour-overlay');
+      if (overlay) {
+        overlay.classList.remove('hidden');
+        gsap.to(overlay, { opacity: 1, duration: 0.4 });
+      }
+
+      // Configure REC badge
+      const recBadge = document.getElementById('tour-rec-badge');
+      const recDot = document.getElementById('tour-rec-dot');
+      const recLabel = document.getElementById('tour-rec-label');
+
+      if (tourRecordMode) {
+        if (recBadge) recBadge.className = 'flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-rose-500/25 border border-rose-500/50 text-rose-300 text-[11px] sm:text-xs font-mono font-bold tracking-wider';
+        if (recDot) recDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping';
+        if (recLabel) recLabel.innerText = '● MEREKAM VIDEO 3D';
+        startNativeCanvasRecording();
+      } else {
+        if (recBadge) recBadge.className = 'flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-[11px] sm:text-xs font-mono font-bold tracking-wider';
+        if (recDot) recDot.className = 'w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse';
+        if (recLabel) recLabel.innerText = '● 3D CINEMA TOUR';
+      }
+
+      // Reset progress
+      const pBar = document.getElementById('tour-progress-bar');
+      if (pBar) pBar.style.width = '0%';
+      const tc = document.getElementById('tour-timecode');
+      if (tc) tc.innerText = '00:00';
+
+      // Start elapsed timer
+      clearInterval(tourTimerInterval);
+      tourTimerInterval = setInterval(() => {
+        tourSecondsElapsed += 0.5;
+        if (tc) tc.innerText = formatTimecode(tourSecondsElapsed);
+        if (pBar) {
+          const pct = Math.min(100, (tourSecondsElapsed / TOTAL_TOUR_DURATION) * 100);
+          pBar.style.width = `${pct}%`;
+        }
+      }, 500);
+
+      // Build GSAP Timeline for all scenes
+      playTourScene(0);
+
+      if (typeof gtag === 'function') {
+        gtag('event', 'start_cinematic_tour', { record_mode: tourRecordMode });
+      }
+    }
+
+    function playTourScene(index) {
+      if (!isCinematicTourActive) return;
+      if (index >= TOUR_SCENES.length) {
+        // Tour completed!
+        stopCinematicTour();
+        return;
+      }
+
+      tourCurrentSceneIndex = index;
+      const scene = TOUR_SCENES[index];
+      if (scene.id !== 'reception' && typeof hideKaraSpeechBalloon === 'function') {
+        hideKaraSpeechBalloon();
+      }
+
+      updateTourLowerThird(scene);
+      if (typeof scene.onEnter === 'function') {
+        scene.onEnter();
+      }
+
+      // Camera motion tween
+      if (tourTimeline) tourTimeline.kill();
+      tourTimeline = gsap.timeline({
+        onComplete: () => {
+          playTourScene(index + 1);
+        }
+      });
+
+      tourTimeline.to(camera.position, {
+        x: scene.cam.x,
+        y: scene.cam.y,
+        z: scene.cam.z,
+        duration: scene.duration,
+        ease: 'power2.inOut'
+      }, 0);
+
+      tourTimeline.to(controls.target, {
+        x: scene.target.x,
+        y: scene.target.y,
+        z: scene.target.z,
+        duration: scene.duration,
+        ease: 'power2.inOut'
+      }, 0);
+    }
+
+    function skipToNextTourScene() {
+      if (!isCinematicTourActive) return;
+      if (tourTimeline) tourTimeline.kill();
+      playTourScene(tourCurrentSceneIndex + 1);
+    }
+
+    function stopCinematicTour() {
+      if (!isCinematicTourActive) return;
+      if (typeof hideKaraSpeechBalloon === 'function') hideKaraSpeechBalloon();
+      isCinematicTourActive = false;
+
+      clearInterval(tourTimerInterval);
+      if (tourTimeline) {
+        tourTimeline.kill();
+        tourTimeline = null;
+      }
+
+      // Re-enable controls
+      if (controls) {
+        controls.enabled = true;
+      }
+
+      // Fade out overlay
+      const overlay = document.getElementById('cinematic-tour-overlay');
+      if (overlay) {
+        gsap.to(overlay, {
+          opacity: 0,
+          duration: 0.4,
+          onComplete: () => {
+            overlay.classList.add('hidden');
+          }
+        });
+      }
+
+      // Stop native recording if active
+      if (tourRecordMode && tourMediaRecorder) {
+        stopNativeCanvasRecording();
+      }
+
+      // Restore camera to smooth overview
+      focusPreset('overview');
+    }
+
+    /* Native In-Browser Canvas Stream Recorder */
+    function startNativeCanvasRecording() {
+      tourRecordedChunks = [];
+      try {
+        const canvas = renderer.domElement;
+        const stream = canvas.captureStream(30); // 30 FPS stream
+
+        let mimeType = 'video/webm;codecs=vp9';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'video/webm;codecs=vp8';
+          if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = 'video/webm';
+          }
+        }
+
+        tourMediaRecorder = new MediaRecorder(stream, {
+          mimeType: mimeType,
+          videoBitsPerSecond: 6000000 // 6 Mbps high definition
+        });
+
+        tourMediaRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            tourRecordedChunks.push(e.data);
+          }
+        };
+
+        tourMediaRecorder.onstop = () => {
+          exportRecordedVideo(mimeType);
+        };
+
+        tourMediaRecorder.start(1000); // 1s slice
+        console.log('[Native Recorder] Recording started at 30 FPS with mime:', mimeType);
+      } catch (err) {
+        console.error('[Native Recorder] Failed to start:', err);
+        alert('Fitur perekam video memerlukan browser modern yang mendukung HTML5 Canvas CaptureStream (Chrome/Edge/Firefox/Safari).');
+      }
+    }
+
+    function stopNativeCanvasRecording() {
+      if (tourMediaRecorder && tourMediaRecorder.state !== 'inactive') {
+        try {
+          tourMediaRecorder.stop();
+        } catch (e) {
+          console.warn('[Native Recorder] Stop error:', e);
+        }
+      }
+    }
+
+    function exportRecordedVideo(mimeType) {
+      if (!tourRecordedChunks || tourRecordedChunks.length === 0) {
+        console.warn('[Native Recorder] No recorded chunks available.');
+        return;
+      }
+
+      const blob = new Blob(tourRecordedChunks, { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const filename = `Tur-Virtual-Office-Kopkar-AKM-${new Date().toISOString().slice(0, 10)}.webm`;
+
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 2000);
+
+      // Show completion toast
+      const fnEl = document.getElementById('recorded-file-name');
+      if (fnEl) fnEl.innerText = filename;
+      const modal = document.getElementById('modal-recording-complete');
+      if (modal) {
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+          if (modal) modal.classList.add('hidden');
+        }, 12000);
+      }
+
+      console.log('[Native Recorder] Video exported successfully:', filename, blob.size, 'bytes');
+    }
+
+    function switchVideoCinemaTab(tabKey) {
+      const btnHyper = document.getElementById('tab-btn-hyperframe');
+      const btnTeaser = document.getElementById('tab-btn-teaser');
+      const btn3D = document.getElementById('tab-btn-3dtour');
+      const paneHyper = document.getElementById('cinema-tab-hyperframe');
+      const paneTeaser = document.getElementById('cinema-tab-teaser');
+      const pane3D = document.getElementById('cinema-tab-3dtour');
+
+      // Reset all buttons
+      [
+        { btn: btnHyper, activeClass: 'text-teal-400 border-teal-400 bg-teal-500/10' },
+        { btn: btnTeaser, activeClass: 'text-amber-400 border-amber-400 bg-amber-500/10' },
+        { btn: btn3D, activeClass: 'text-cyan-400 border-cyan-400 bg-cyan-500/10' }
+      ].forEach(item => {
+        if (item.btn) {
+          item.btn.className = 'px-3 sm:px-4 py-2 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 border-b-2 transition-all cursor-pointer text-slate-400 hover:text-white border-transparent';
+        }
+      });
+
+      if (paneHyper) paneHyper.classList.add('hidden');
+      if (paneTeaser) paneTeaser.classList.add('hidden');
+      if (pane3D) pane3D.classList.add('hidden');
+
+      if (tabKey === 'hyperframe') {
+        if (btnHyper) btnHyper.className = 'px-3 sm:px-4 py-2 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 border-b-2 transition-all cursor-pointer text-teal-400 border-teal-400 bg-teal-500/10';
+        if (paneHyper) paneHyper.classList.remove('hidden');
+      } else if (tabKey === 'teaser') {
+        if (btnTeaser) btnTeaser.className = 'px-3 sm:px-4 py-2 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 border-b-2 transition-all cursor-pointer text-amber-400 border-amber-400 bg-amber-500/10';
+        if (paneTeaser) paneTeaser.classList.remove('hidden');
+      } else {
+        if (btn3D) btn3D.className = 'px-3 sm:px-4 py-2 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 border-b-2 transition-all cursor-pointer text-cyan-400 border-cyan-400 bg-cyan-500/10';
+        if (pane3D) pane3D.classList.remove('hidden');
+      }
+    }
+
   </script>
 
     <!-- =====================================================================
        DIGITAL RECEPTION & MEMBER SERVICE MODAL (KOPKAR AKM OFFICIAL)
        ===================================================================== -->
+    <!-- =====================================================================
+       HYPERFRAMES CINEMA VIDEO MODAL (KOPKAR AKM VIRTUAL OFFICE)
+       ===================================================================== -->
+  <div id="modal-video-cinema" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-2 sm:p-5 transition-all duration-300">
+    <div class="bg-slate-900/95 border border-teal-500/35 rounded-3xl w-full max-w-5xl max-h-[95vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="px-5 py-3.5 border-b border-white/10 flex items-center justify-between bg-slate-950/80">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-teal-500 to-amber-500 p-0.5 flex items-center justify-center shadow-lg">
+            <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-teal-400 text-lg">
+              <i class="ph ph-video-camera"></i>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-extrabold text-sm sm:text-base text-white">Video Animasi Keseharian & Layanan</h3>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                HyperFrames Engine
+              </span>
+            </div>
+            <p class="text-xs text-slate-400">Koperasi Jasa Adaro Karya Mandiri (Kopkar AKM)</p>
+          </div>
+        </div>
+        <button onclick="closeVideoCinemaModal()" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+          <i class="ph ph-x text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Video Cinema Tabs -->
+      <div class="px-3 sm:px-5 pt-3 pb-0 bg-slate-950 border-b border-white/10 flex items-center gap-1.5 sm:gap-2 overflow-x-auto">
+        <button id="tab-btn-teaser" onclick="switchVideoCinemaTab('teaser')" class="px-3 sm:px-4 py-2 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 border-b-2 transition-all cursor-pointer text-amber-400 border-amber-400 bg-amber-500/10 whitespace-nowrap">
+          <i class="ph ph-device-mobile text-base"></i> <span>Teaser Sinematik 9:16</span>
+          <span class="px-1.5 py-0.2 rounded-full text-[9px] bg-amber-500/30 text-amber-200">Baru</span>
+        </button>
+        <button id="tab-btn-hyperframe" onclick="switchVideoCinemaTab('hyperframe')" class="px-3 sm:px-4 py-2 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 border-b-2 transition-all cursor-pointer text-slate-400 hover:text-white border-transparent whitespace-nowrap">
+          <i class="ph ph-film-slate text-base"></i> <span>Video Profil 16:9</span>
+        </button>
+        <button id="tab-btn-3dtour" onclick="switchVideoCinemaTab('3dtour')" class="px-3 sm:px-4 py-2 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 border-b-2 transition-all cursor-pointer text-slate-400 hover:text-white border-transparent whitespace-nowrap">
+          <i class="ph ph-cube text-base"></i> <span>Tur 3D Virtual</span>
+        </button>
+      </div>
+
+      <!-- Tab Content: Teaser Sinematik 9:16 Frame -->
+      <div id="cinema-tab-teaser" class="relative w-full h-[620px] bg-black overflow-hidden flex items-center justify-center p-2">
+        <iframe id="video-teaser-iframe" src="kopkar-akm-teaser/kopkar-akm-teaser-standalone.html" class="w-full h-full border-0 rounded-2xl" allow="autoplay; fullscreen"></iframe>
+      </div>
+
+      <!-- Tab Content 1: HyperFrames Video Player Frame -->
+      <div id="cinema-tab-hyperframe" class="hidden relative w-full aspect-video bg-black overflow-hidden flex items-center justify-center">
+        <iframe id="video-cinema-iframe" src="kopkar-akm-video/kopkar-akm-video-standalone.html" class="w-full h-full border-0" allow="autoplay; fullscreen"></iframe>
+      </div>
+
+      <!-- Tab Content 2: 3D Live Tour & Recorder Launcher -->
+      <div id="cinema-tab-3dtour" class="hidden p-6 bg-slate-950 flex flex-col items-center justify-center text-center gap-4 min-h-[360px]">
+        <div class="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center text-3xl shadow-xl">
+          <i class="ph ph-video-camera"></i>
+        </div>
+        <div class="max-w-lg">
+          <h4 class="text-lg font-bold text-white">Tur Sinematik 3D & Perekam Video Bawaan</h4>
+          <p class="text-xs sm:text-sm text-slate-300 mt-1">
+            Kamera akan terbang otomatis mengunjungi resepsionis Mbak Kara, etalase toko ritel Adamart, galeri pengurus, serta meja layanan. Anda dapat langsung merekam dan mengunduh videonya (.webm) ke komputer secara offline dan 100% aman tanpa perantara pihak ketiga.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-3 mt-2">
+          <button onclick="closeVideoCinemaModal(); startCinematicTour(false);" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg transition-all active:scale-95 cursor-pointer">
+            <i class="ph ph-play-circle text-lg"></i> Putar Tur 3D Sekarang
+          </button>
+          <button onclick="closeVideoCinemaModal(); startCinematicTour(true);" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg transition-all active:scale-95 cursor-pointer">
+            <span class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span> Putar & Rekam Video (.webm)
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-400">
+          <i class="ph ph-shield-check text-emerald-400"></i> Video diolah langsung di peramban Anda (HTML5 Canvas Capture & MediaRecorder). Privasi terjamin aman.
+        </p>
+      </div>
+
+      <!-- Footer Info Strip -->
+      <div class="px-5 py-3 bg-slate-950/90 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-300">
+        <div class="flex items-center gap-4 flex-wrap">
+          <span>🌸 Resepsionis: <strong class="text-white">Mbak Kara</strong></span>
+          <span>💼 Unit: <strong class="text-white">Simpan Pinjam, Wisata, Toko Adamart, Digital</strong></span>
+        </div>
+        <a href="kopkar-akm-video/kopkar-akm-video-standalone.html" target="_blank" class="px-3 py-1.5 rounded-lg bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 border border-teal-500/30 flex items-center gap-1.5 font-bold transition-all cursor-pointer">
+          <i class="ph ph-arrow-square-out"></i> Buka Tab Penuh
+        </a>
+      </div>
+    </div>
+  </div>
+
   <div id="modal-digital-reception" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-5 transition-all duration-300">
     <div class="bg-slate-900/95 border border-white/15 rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
       
@@ -7797,6 +8463,27 @@
              TAB 1: PROFIL KOPERASI & PENGURUS
              ========================================== -->
         <div id="reception-tab-profil" class="reception-tab-panel flex flex-col gap-5">
+          <!-- HyperFrames Video Showcase Banner -->
+          <div class="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-teal-950/70 via-slate-900 to-amber-950/40 border border-teal-500/35 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-500/30 flex items-center justify-center text-xl shrink-0">
+                🎬
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h5 class="font-extrabold text-white text-xs sm:text-sm">Video Animasi Keseharian & Layanan Koperasi</h5>
+                  <span class="text-[9px] font-bold text-teal-300 bg-teal-500/20 px-2 py-0.2 rounded border border-teal-500/30">HyperFrames</span>
+                </div>
+                <p class="text-[11px] text-slate-300 mt-0.5 leading-snug">
+                  Saksikan video explainer animasi singkat seputar keseharian di virtual office, struktur pengurus, dan 4 unit usaha unggulan Kopkar AKM.
+                </p>
+              </div>
+            </div>
+            <button onclick="openVideoCinemaModal()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-500 hover:bg-teal-400 text-slate-950 flex items-center gap-1.5 whitespace-nowrap shadow-md cursor-pointer transition-all shrink-0">
+              <i class="ph ph-play-circle text-base"></i> Putar Video
+            </button>
+          </div>
+
           <!-- Legalitas Banner -->
           <div class="p-4 rounded-2xl bg-gradient-to-r from-teal-950/60 via-slate-900 to-slate-950 border border-teal-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
             <div>
@@ -8384,6 +9071,114 @@
         </button>
       </div>
 
+    </div>
+  </div>
+
+
+  <!-- =====================================================================
+       CINEMATIC 3D TOUR & RECORDING OVERLAY (KOPKAR AKM 3D ENGINE)
+       ===================================================================== -->
+  <div id="cinematic-tour-overlay" class="fixed inset-0 pointer-events-none z-40 hidden flex flex-col justify-between transition-opacity duration-500 opacity-0 select-none">
+    
+    <!-- Top Cinematic Letterbox Bar -->
+    <div class="w-full bg-gradient-to-b from-black/95 via-black/80 to-transparent pt-3 sm:pt-4 pb-8 sm:pb-10 px-4 sm:px-8 pointer-events-auto flex items-center justify-between shadow-2xl">
+      <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+        <!-- Status REC / CINEMA Dot -->
+        <div id="tour-rec-badge" class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-[11px] sm:text-xs font-mono font-bold tracking-wider">
+          <span id="tour-rec-dot" class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+          <span id="tour-rec-label">● 3D CINEMA TOUR</span>
+        </div>
+        
+        <!-- Timecode Display -->
+        <div class="font-mono text-xs sm:text-sm font-bold text-white tracking-widest bg-slate-900/80 px-2.5 sm:px-3 py-1 rounded-full border border-white/10 shadow-inner">
+          <span id="tour-timecode">00:00</span> <span class="text-slate-500">/</span> <span class="text-slate-400" id="tour-duration">00:40</span>
+        </div>
+
+        <!-- Active Scene Indicator -->
+        <div id="tour-scene-pill" class="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-white/10 text-slate-300 text-xs font-semibold">
+          <i class="ph ph-video-camera text-cyan-400"></i>
+          <span id="tour-scene-title">Scene 1: Virtual Office Overview</span>
+        </div>
+      </div>
+
+      <!-- Action Controls -->
+      <div class="flex items-center gap-2">
+        <!-- Next Scene Button -->
+        <button onclick="skipToNextTourScene()" class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 border border-white/15 backdrop-blur-md transition-all active:scale-95 cursor-pointer" title="Lompat ke Scene Berikutnya">
+          <span>Lewati</span> <i class="ph ph-skip-forward"></i>
+        </button>
+        <!-- Stop Button -->
+        <button onclick="stopCinematicTour()" class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-rose-600/90 hover:bg-rose-500 text-white text-xs font-bold flex items-center gap-1.5 border border-rose-400/40 shadow-lg active:scale-95 transition-all cursor-pointer" title="Hentikan Tur Sinematik">
+          <i class="ph ph-stop"></i> <span>Selesai</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Cinematic Letterbox Bar with Dynamic Broadcast Lower-Third Card -->
+    <div class="w-full bg-gradient-to-t from-black/95 via-black/85 to-transparent pb-6 pt-12 px-4 sm:px-8 pointer-events-auto flex flex-col gap-3 shadow-2xl relative">
+      
+      <!-- Progress Bar along Top Edge -->
+      <div class="w-full h-1 bg-slate-800/80 rounded-full overflow-hidden border border-white/10">
+        <div id="tour-progress-bar" class="h-full bg-gradient-to-r from-cyan-400 via-teal-400 to-amber-400 w-0 transition-all duration-300 ease-linear"></div>
+      </div>
+
+      <!-- Dynamic Lower Third -->
+      <div id="tour-lower-third" class="max-w-3xl transform transition-all duration-500 translate-y-0 opacity-100">
+        <div class="bg-slate-950/85 backdrop-blur-xl border border-white/20 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col gap-1.5 sm:gap-2 relative overflow-hidden">
+          <!-- Accent Glowing Top Stripe -->
+          <div id="lower-third-stripe" class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-400 via-cyan-400 to-amber-400 transition-colors duration-500"></div>
+
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <span id="lower-third-badge" class="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-extrabold uppercase tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/40">
+                SELAMAT DATANG
+              </span>
+              <span class="text-xs text-slate-400 hidden sm:inline">• Kopkar Adaro Karya Mandiri</span>
+            </div>
+            <div class="text-[10px] text-slate-400 font-mono tracking-tight flex items-center gap-1">
+              <i class="ph ph-broadcast text-teal-400"></i> LIVE 3D ENGINE
+            </div>
+          </div>
+
+          <!-- Headline Title -->
+          <h3 id="lower-third-title" class="text-sm sm:text-lg md:text-xl font-black text-white tracking-tight leading-tight">
+            Sentra Virtual Office Kopkar AKM
+          </h3>
+
+          <!-- Subtitle Description -->
+          <p id="lower-third-subtitle" class="text-xs sm:text-sm text-slate-300 leading-snug">
+            Pusat Pelayanan Terpadu Koperasi Karyawan PT Adaro Indonesia & Mitra Kerja.
+          </p>
+
+          <!-- Chips / Key Information -->
+          <div id="lower-third-chips" class="flex flex-wrap items-center gap-1 sm:gap-1.5 pt-0.5 text-[10px] sm:text-[11px] text-slate-300">
+            <span class="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10">Badan Hukum No. 2128/BH/IX</span>
+            <span class="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10">Site Km 73 & Kelanis</span>
+            <span class="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10">Hotline: 0811-501-144</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal Download Toast (Muncul setelah selesai rekam video) -->
+  <div id="modal-recording-complete" class="fixed bottom-6 right-6 z-50 hidden max-w-md bg-slate-900/95 border border-teal-500/50 p-4 rounded-2xl shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom duration-300 select-none">
+    <div class="flex items-start gap-3">
+      <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-xl shrink-0 border border-teal-500/30">
+        <i class="ph ph-check-circle"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <h4 class="font-bold text-sm text-white">Video 3D Berhasil Direkam!</h4>
+        <p class="text-xs text-slate-300 mt-0.5 leading-snug">
+          File rekaman <strong class="text-teal-300" id="recorded-file-name">Tur-Virtual-Office-Kopkar-AKM.webm</strong> telah otomatis diunduh ke folder Downloads Anda.
+        </p>
+        <div class="mt-2.5 flex items-center gap-2">
+          <button onclick="document.getElementById('modal-recording-complete').classList.add('hidden')" class="px-3 py-1 rounded-lg bg-teal-500 hover:bg-teal-600 text-slate-950 font-bold text-xs transition-all cursor-pointer">
+            Baik, Terima Kasih
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
