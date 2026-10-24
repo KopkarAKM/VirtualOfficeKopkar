@@ -4349,7 +4349,6 @@
        Sesuai permintaan & referensi visual User:
        - Meja resepsionis kayu & marmer elegan
        - NPC Petugas Resepsionis (Mbak Kara - Sekretaris & Layanan Anggota)
-       - Standing Kiosk Layanan Sentuh Digital
        - Standing Roll Banner Selamat Datang
        - Meja Tunggu & Pot Monstera
        ===================================================================== */
@@ -5189,11 +5188,7 @@
 
       scene.add(g);
 
-      // -------------------------------------------------------------
-      // 4. STANDING TOUCHSCREEN KIOSK (TOTEM SENTUH DIGITAL)
-      // Diposisikan di samping kanan meja resepsionis (x = -10.2, z = 0.5)
-      // -------------------------------------------------------------
-      buildStandingKiosk(new THREE.Vector3(-10.2, 0, 0.6), Math.PI / 2);
+
 
       // -------------------------------------------------------------
       // 5. STANDING ROLL BANNER (X-BANNER KOPKAR ADARO)
@@ -5209,124 +5204,6 @@
     }
 
     /* 4B. TOTEM STANDING KIOSK TOUCHSCREEN DIGITAL */
-    function buildStandingKiosk(pos, rotY) {
-      const g = new THREE.Group();
-      g.position.copy(pos);
-      g.rotation.y = rotY;
-
-      // Heavy weighted base plate
-      const base = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.32, 0.35, 0.04, 32),
-        new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.2 })
-      );
-      base.position.y = 0.02;
-      g.add(base);
-
-      // Vertical support pillar
-      const pillar = new THREE.Mesh(
-        new THREE.BoxGeometry(0.12, 1.05, 0.08),
-        new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.85, roughness: 0.25 })
-      );
-      pillar.position.y = 0.55;
-      g.add(pillar);
-
-      // Touchscreen Kiosk Display Screen Canvas
-      const kCanvas = document.createElement('canvas');
-      kCanvas.width = 512;
-      kCanvas.height = 768;
-      const kCtx = kCanvas.getContext('2d');
-
-      // Modern Glass UI on Totem Screen
-      kCtx.fillStyle = '#090e1a';
-      kCtx.fillRect(0, 0, 512, 768);
-
-      // Header on Screen
-      kCtx.fillStyle = '#0f766e';
-      kCtx.fillRect(20, 20, 472, 80);
-      kCtx.strokeStyle = '#2dd4bf';
-      kCtx.lineWidth = 3;
-      kCtx.strokeRect(20, 20, 472, 80);
-
-      kCtx.fillStyle = '#ffffff';
-      kCtx.font = 'bold 22px "DM Sans", sans-serif';
-      kCtx.textAlign = 'center';
-      kCtx.fillText('DIGITAL RECEPTION KIOSK', 256, 56);
-      kCtx.fillStyle = '#99f6e4';
-      kCtx.font = 'bold 14px "DM Sans", sans-serif';
-      kCtx.fillText('Sentuh Layar Untuk Buka Menu', 256, 82);
-
-      // 4 Menu Buttons on Screen
-      const menuItems = [
-        { title: '🏛️ PROFIL & PENGURUS', desc: 'Visi, misi, dan struktur koperasi', color: '#1e3a8a', border: '#60a5fa' },
-        { title: '📝 CARA JADI ANGGOTA', desc: 'Syarat, formulir & hak SHU anggota', color: '#065f46', border: '#34d399' },
-        { title: '🛒 TOKO ADAMART', desc: 'Katalog produk 73 & Kelanis', color: '#881337', border: '#fb7185' },
-        { title: '📞 KONTAK PENGELOLA', desc: 'WhatsApp pengurus & customer service', color: '#431407', border: '#fb923c' }
-      ];
-
-      menuItems.forEach((item, idx) => {
-        const yBox = 130 + idx * 135;
-        kCtx.fillStyle = item.color;
-        kCtx.fillRect(30, yBox, 452, 115);
-        kCtx.strokeStyle = item.border;
-        kCtx.lineWidth = 2.5;
-        kCtx.strokeRect(30, yBox, 452, 115);
-
-        kCtx.fillStyle = '#ffffff';
-        kCtx.font = 'bold 22px "DM Sans", sans-serif';
-        kCtx.textAlign = 'left';
-        kCtx.fillText(item.title, 55, yBox + 46);
-
-        kCtx.fillStyle = '#cbd5e1';
-        kCtx.font = '15px "DM Sans", sans-serif';
-        kCtx.fillText(item.desc, 55, yBox + 82);
-      });
-
-      // Bottom pulse hint
-      kCtx.fillStyle = '#f59e0b';
-      kCtx.font = 'bold 18px "DM Sans", sans-serif';
-      kCtx.textAlign = 'center';
-      kCtx.fillText('👆 SENTUH UNTUK MEMILIH LAYANAN', 256, 725);
-
-      const kTex = new THREE.CanvasTexture(kCanvas);
-      const screenMesh = new THREE.Mesh(
-        new THREE.BoxGeometry(0.58, 0.86, 0.04),
-        new THREE.MeshBasicMaterial({ map: kTex })
-      );
-      screenMesh.position.set(0, 1.25, 0.05);
-      screenMesh.rotation.x = -0.18; // Sedikit miring ke atas agar nyaman dilihat mata
-      g.add(screenMesh);
-
-      // Bezel Frame Screen
-      const screenBezel = new THREE.Mesh(
-        new THREE.BoxGeometry(0.62, 0.90, 0.03),
-        new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9, roughness: 0.2 })
-      );
-      screenBezel.position.set(0, 1.25, 0.03);
-      screenBezel.rotation.x = -0.18;
-      g.add(screenBezel);
-
-      // Interactivity
-      screenMesh.userData.isKioskClickable = true;
-      INTERACTIVE_RECEPTION_MESHES.push(screenMesh);
-
-      // Floating Kiosk Label 2D
-      const kioskDiv = document.createElement('div');
-      kioskDiv.className = 'staff-3d-name-tag staff-tag-teal flex items-center gap-1.5 cursor-pointer hover:scale-110 transition-transform shadow-lg';
-      kioskDiv.innerHTML = `
-        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-        <span class="font-bold text-[10px] text-white">🖥️ Kiosk Layanan Sentuh</span>
-      `;
-      kioskDiv.onclick = (e) => {
-        e.stopPropagation();
-        openReceptionModal();
-      };
-      const kioskLabel = new THREE.CSS2DObject(kioskDiv);
-      kioskLabel.position.set(0, 1.82, 0);
-      g.add(kioskLabel);
-
-      scene.add(g);
-    }
-
     /* 4C. STANDING ROLL BANNER (X-BANNER) */
     function buildRollBanner(pos, rotY) {
       const g = new THREE.Group();
