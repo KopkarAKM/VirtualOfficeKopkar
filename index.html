@@ -106,7 +106,49 @@
       align-items: center;
       gap: 4px;
     }
+    
     /* ==============================================================
+       FLOATING 3D VISITOR HUD (MULTI-USER PRESENCE)
+       ============================================================== */
+    .visitor-hud {
+      pointer-events: auto;
+      transform: translate(-50%, -100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      user-select: none;
+      cursor: pointer;
+      z-index: 38;
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .visitor-hud:hover {
+      transform: translate(-50%, -108%) scale(1.08);
+    }
+    .visitor-hud-self .hud-pill {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.92));
+      border: 1.5px solid rgba(245, 158, 11, 0.9);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(245, 158, 11, 0.45);
+    }
+    .visitor-hud-other .hud-pill {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(15, 30, 45, 0.9));
+      border: 1px solid rgba(6, 182, 212, 0.75);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 12px rgba(6, 182, 212, 0.35);
+    }
+    .visitor-act-pill {
+      font-size: 8.5px;
+      font-weight: 600;
+      color: #e2e8f0;
+      background: rgba(2, 6, 23, 0.88);
+      padding: 1.5px 7px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      white-space: nowrap;
+    }
+
+/* ==============================================================
        FLOATING 2D DESK & AREA TAGS (HUD LABELS)
        ============================================================== */
     .hud-tag-desk {
@@ -311,6 +353,24 @@
           <span class="text-[9px] text-slate-400 hidden lg:inline font-semibold">Kunjungan</span>
         </div>
 
+        <!-- Live Active Visitors Badge -->
+        <button onclick="openVisitorModal()" class="pointer-events-auto flex items-center gap-1.5 glass-panel px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-2xl shadow-sm border border-emerald-500/35 hover:border-emerald-400 text-slate-200 transition-all shrink-0 cursor-pointer" title="Pengunjung Online Saat Ini di Kantor 3D (Klik untuk Ubah Profil Tamu)">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="text-[10px] sm:text-xs font-mono font-bold text-emerald-300" id="header-live-visitors-count">5</span>
+          <span class="text-[9px] text-slate-300 hidden sm:inline font-semibold">Tamu Hadir</span>
+        </button>
+
+        <!-- Personal Avatar & Name Badge Button -->
+        <button onclick="openVisitorModal()" id="btn-self-visitor-name" class="glass-button px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-amber-200 border border-amber-500/35 shadow-md hover:border-amber-400 transition-all shrink-0 cursor-pointer" title="Ubah Nama & Gaya Karakter Tamu 3D Anda">
+          <span class="text-xs">⭐</span>
+          <span id="header-self-visitor-name" class="text-[10px] sm:text-xs font-bold max-w-[85px] sm:max-w-[125px] truncate">Tamu #...</span>
+          <i class="ph ph-pencil-simple text-[10px] text-amber-400/80"></i>
+        </button>
+
+
     <!-- Quick Actions & Camera Dropdown (Sisi Kanan) -->
     <div class="pointer-events-auto flex items-center gap-1 sm:gap-1.5 shrink-0">
       <!-- DROPDOWN KAMERA -->
@@ -330,6 +390,12 @@
           <div class="space-y-0.5">
 <button onclick="selectPreset('overview', 'Overview (Semua)')" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs text-slate-200 hover:bg-indigo-600/30 hover:text-white flex items-center gap-2 transition-all">
               <i class="ph ph-buildings text-indigo-400"></i> <span>Overview (Semua)</span>
+            </button>
+            <button onclick="selectPreset('my-avatar', 'Avatar Tamu Saya')" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs text-amber-300 hover:bg-amber-600/30 hover:text-white flex items-center gap-2 transition-all font-bold">
+              <span>⭐</span> <span>Karakter / Avatar Saya (Tamu)</span>
+            </button>
+            <button onclick="selectPreset('waiting-lounge', 'Ruang Tunggu Tamu')" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs text-teal-300 hover:bg-teal-600/30 hover:text-white flex items-center gap-2 transition-all">
+              <i class="ph ph-armchair text-teal-400"></i> <span>Ruang Tunggu Tamu &amp; Santai</span>
             </button>
             <button onclick="selectPreset('manager-kop', 'Pak Fedrik')" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs text-slate-200 hover:bg-indigo-600/30 hover:text-white flex items-center gap-2 transition-all">
               <i class="ph ph-crown text-blue-400"></i> <span>Meja Pak Fedrik (Manajer Kop)</span>
@@ -1348,6 +1414,13 @@
       coffeeSpot:     { x: -8.5,  z: 6.3 },
       printerSpot:    { x: -5.5,  z: -6.5 },
       
+            // 5. Visitor Reception, Entrance & Lounge Nodes
+      entranceDoor:   { x: -11.0, z: -1.0 },
+      receptionArea:  { x: -8.7,  z: -1.0 },
+      loungeStool1:   { x: -7.45, z: -0.6 },
+      loungeStool2:   { x: -8.95, z: -1.0 },
+      awardGallery:   { x: -8.0,  z: -6.3 },
+
       // Minimarket Interior Aisles
       miniAisle73:    { x: 4.2,   z: -3.8 },
       miniAisleKel:   { x: 4.2,   z: 3.5 },
@@ -1368,7 +1441,13 @@
       northMid:     ['northWest', 'northEast', 'meetingNorth', 'mahmudaExit'],
       northEast:    ['northMid', 'eastMid', 'miniAisle73'],
 
-      westMid:      ['northWest', 'westSouth', 'sriExit'],
+      westMid:      ['northWest', 'westSouth', 'sriExit', 'receptionArea', 'loungeStool1'],
+      entranceDoor:   ['receptionArea'],
+      receptionArea:  ['entranceDoor', 'loungeStool1', 'loungeStool2', 'westMid'],
+      loungeStool1:   ['receptionArea', 'westMid'],
+      loungeStool2:   ['receptionArea', 'loungeStool1', 'westMid'],
+      awardGallery:   ['northWest', 'printerSpot'],
+
       westSouth:    ['westMid', 'southMid', 'sriExit', 'rikaExit', 'westPantry'],
       westPantry:   ['westSouth', 'rikaExit', 'coffeeSpot'],
 
@@ -7082,6 +7161,20 @@
     }
 
     function focusPreset(presetKey) {
+        if (presetKey === 'my-avatar') {
+          if (window.VISITOR_SYSTEM && window.VISITOR_SYSTEM.self && window.VISITOR_SYSTEM.self.mesh) {
+            const p = window.VISITOR_SYSTEM.self.mesh.position;
+            gsap.to(controls.target, { x: p.x, y: 1.2, z: p.z, duration: 1.2, ease: 'power2.inOut' });
+            gsap.to(camera.position, { x: p.x - 3.2, y: 2.6, z: p.z + 3.8, duration: 1.2, ease: 'power2.inOut' });
+            return;
+          }
+        }
+        if (presetKey === 'waiting-lounge') {
+          gsap.to(controls.target, { x: -8.2, y: 0.8, z: -0.8, duration: 1.2, ease: 'power2.inOut' });
+          gsap.to(camera.position, { x: -5.2, y: 2.4, z: 2.0, duration: 1.2, ease: 'power2.inOut' });
+          return;
+        }
+
       document.querySelectorAll('header .glass-button').forEach(b => b.classList.remove('active'));
       const activeBtn = document.getElementById(`btn-cam-${presetKey}`);
       if (activeBtn) activeBtn.classList.add('active');
@@ -7658,6 +7751,12 @@
         updateReceptionistKara(delta, clockTicker);
       }
 
+      // Realtime Dynamic Visitors & Self Avatar Simulation (Multi-User)
+      if (typeof updateVisitorSimulation === 'function') {
+        updateVisitorSimulation(delta, clockTicker);
+      }
+
+
       // Canvas only updates on data change or gentle interval to eliminate flickering/stuttering
 
       controls.update();
@@ -7681,8 +7780,918 @@
       animate();
       syncPresenceData();
       setInterval(syncPresenceData, 120000);
+      initVisitorPresenceSystem();
     });
   
+    
+    /* =====================================================================
+       REALTIME MULTI-USER VISITOR PRESENCE & DYNAMIC CROWD SYSTEM (VERSI 1)
+       ===================================================================== */
+    const VISITOR_DESTINATIONS = [
+      {
+        name: 'Meja Resepsionis Mbak Kara',
+        state: 'RECEPTION',
+        x: -8.7,
+        z: -1.0,
+        heading: -Math.PI / 2, // Menghadap langsung meja Mbak Kara
+        act: 'Menyapa Resepsionis Mbak Kara',
+        dwellTime: 12,
+        isSitting: false
+      },
+      {
+        name: 'Ruang Tunggu - Bangku Otoman 1',
+        state: 'LOUNGE',
+        x: -7.45,
+        z: -0.6,
+        heading: 0,
+        act: 'Santai di Bangku Otoman Lounge',
+        dwellTime: 18,
+        isSitting: true
+      },
+      {
+        name: 'Ruang Tunggu - Bangku Otoman 2',
+        state: 'LOUNGE',
+        x: -8.95,
+        z: -1.0,
+        heading: Math.PI / 4,
+        act: 'Membaca Majalah di Ruang Tunggu',
+        dwellTime: 16,
+        isSitting: true
+      },
+      {
+        name: 'Kulkas Minuman Dingin Toko Adamart',
+        state: 'ADAMART',
+        x: 8.2,
+        z: -5.2,
+        heading: -Math.PI / 2, // Menghadap kulkas
+        act: 'Melihat Minuman Dingin di Adamart',
+        dwellTime: 14,
+        isSitting: false
+      },
+      {
+        name: 'Rak Makanan Ringan Toko Adamart',
+        state: 'ADAMART',
+        x: 8.0,
+        z: 0.5,
+        heading: 0,
+        act: 'Memilih Snack & Biskuit di Adamart',
+        dwellTime: 15,
+        isSitting: false
+      },
+      {
+        name: 'Dinding Prestasi & Penghargaan',
+        state: 'GALLERY',
+        x: -8.0,
+        z: -6.3,
+        heading: -Math.PI,
+        act: 'Melihat Dinding Prestasi Koperasi',
+        dwellTime: 14,
+        isSitting: false
+      },
+      {
+        name: 'Pojok Kopi & Istirahat Pantry',
+        state: 'PANTRY',
+        x: -8.5,
+        z: 6.3,
+        heading: 0,
+        act: 'Menikmati Kopi Hangat di Pantry',
+        dwellTime: 16,
+        isSitting: false
+      },
+      {
+        name: 'Meja Rapat Anggota',
+        state: 'MEETING',
+        x: -0.5,
+        z: 1.3,
+        heading: -Math.PI / 2,
+        act: 'Duduk di Meja Diskusi & Rapat',
+        dwellTime: 20,
+        isSitting: true
+      }
+    ];
+
+    window.VISITOR_ROSTER = [];
+    window.VISITOR_SYSTEM = {
+      self: null,
+      channel: null,
+      selectedOutfit: 'safety_vest'
+    };
+
+    function createBatikTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#3b1c0b';
+      ctx.fillRect(0, 0, 128, 128);
+
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 2.5;
+      for (let y = -32; y < 160; y += 32) {
+        for (let x = -32; x < 160; x += 32) {
+          ctx.beginPath();
+          ctx.moveTo(x + 16, y);
+          ctx.lineTo(x + 32, y + 16);
+          ctx.lineTo(x + 16, y + 32);
+          ctx.lineTo(x, y + 16);
+          ctx.closePath();
+          ctx.stroke();
+
+          ctx.fillStyle = '#fef3c7';
+          ctx.beginPath();
+          ctx.arc(x + 16, y + 16, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(2, 2);
+      return tex;
+    }
+
+    function createVisitorFaceTexture(visitor) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(42, 54, 7, 0, Math.PI * 2);
+      ctx.arc(86, 54, 7, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(44, 52, 2.5, 0, Math.PI * 2);
+      ctx.arc(88, 52, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(32, 42); ctx.lineTo(52, 42);
+      ctx.moveTo(76, 42); ctx.lineTo(96, 42);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#b91c1c';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.arc(64, 76, 18, 0.15 * Math.PI, 0.85 * Math.PI);
+      ctx.stroke();
+
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    function buildVisitorCharacterMesh(visitor) {
+      const charGroup = new THREE.Group();
+      charGroup.userData = { visitor };
+
+      const outfit = visitor.outfit || 'safety_vest';
+      const skinMat = new THREE.MeshStandardMaterial({
+        color: visitor.skinColor || 0xffd1a4,
+        roughness: 0.6
+      });
+
+      let clothesMat, pantsMat, shoesMat;
+      if (outfit === 'safety_vest') {
+        clothesMat = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.5 });
+        pantsMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.65 });
+        shoesMat = new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.4 });
+      } else if (outfit === 'batik') {
+        const batikTex = createBatikTexture();
+        clothesMat = new THREE.MeshStandardMaterial({ map: batikTex, roughness: 0.55 });
+        pantsMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 });
+        shoesMat = new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 0.2 });
+      } else if (outfit === 'smart_casual') {
+        clothesMat = new THREE.MeshStandardMaterial({ color: 0x0f766e, roughness: 0.5 });
+        pantsMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.6 });
+        shoesMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
+      } else if (outfit === 'hijab') {
+        clothesMat = new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.65 });
+        pantsMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6 });
+        shoesMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 });
+      } else {
+        clothesMat = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.5 });
+        pantsMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
+        shoesMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3 });
+      }
+
+      // 1. TORSO
+      const torso = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.55, 0.28), clothesMat);
+      torso.position.y = 0.95;
+      torso.castShadow = true;
+      charGroup.add(torso);
+      charGroup.userData.torso = torso;
+
+      if (outfit === 'safety_vest') {
+        const refMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.85, roughness: 0.2 });
+        const chestTape = new THREE.Mesh(new THREE.BoxGeometry(0.485, 0.05, 0.285), refMat);
+        chestTape.position.set(0, 1.05, 0);
+        charGroup.add(chestTape);
+
+        const waistTape = new THREE.Mesh(new THREE.BoxGeometry(0.485, 0.05, 0.285), refMat);
+        waistTape.position.set(0, 0.82, 0);
+        charGroup.add(waistTape);
+
+        const leftHarness = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.28, 0.285), refMat);
+        leftHarness.position.set(-0.14, 1.08, 0);
+        charGroup.add(leftHarness);
+
+        const rightHarness = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.28, 0.285), refMat);
+        rightHarness.position.set(0.14, 1.08, 0);
+        charGroup.add(rightHarness);
+
+        const badge = new THREE.Mesh(
+          new THREE.BoxGeometry(0.09, 0.12, 0.02),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })
+        );
+        badge.position.set(-0.14, 0.96, 0.145);
+        charGroup.add(badge);
+
+        const badgePhoto = new THREE.Mesh(
+          new THREE.BoxGeometry(0.05, 0.05, 0.025),
+          new THREE.MeshStandardMaterial({ color: 0x0284c7 })
+        );
+        badgePhoto.position.set(-0.14, 0.98, 0.15);
+        charGroup.add(badgePhoto);
+
+      } else if (outfit === 'batik') {
+        const collar = new THREE.Mesh(
+          new THREE.BoxGeometry(0.18, 0.12, 0.03),
+          new THREE.MeshStandardMaterial({ color: 0x451a03 })
+        );
+        collar.position.set(0, 1.16, 0.135);
+        charGroup.add(collar);
+
+      } else if (outfit === 'smart_casual') {
+        const collar = new THREE.Mesh(
+          new THREE.BoxGeometry(0.20, 0.10, 0.03),
+          new THREE.MeshStandardMaterial({ color: 0xffffff })
+        );
+        collar.position.set(0, 1.16, 0.135);
+        charGroup.add(collar);
+      }
+
+      // 2. HEAD WITH PROCEDURAL FACE
+      const faceTex = createVisitorFaceTexture(visitor);
+      const faceMat = new THREE.MeshStandardMaterial({ map: faceTex, roughness: 0.55 });
+      const headMaterials = [skinMat, skinMat, skinMat, skinMat, faceMat, skinMat];
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.36, 0.32), headMaterials);
+      head.position.y = 1.45;
+      head.castShadow = true;
+      charGroup.add(head);
+      charGroup.userData.head = head;
+
+      // 3. HEADWEAR
+      if (outfit === 'safety_vest') {
+        const helmetMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.3, metalness: 0.1 });
+        const helmetDome = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.16, 0.38), helmetMat);
+        helmetDome.position.set(0, 1.63, 0);
+        charGroup.add(helmetDome);
+
+        const helmetBrim = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.03, 0.16), helmetMat);
+        helmetBrim.position.set(0, 1.57, 0.22);
+        helmetBrim.rotation.x = 0.12;
+        charGroup.add(helmetBrim);
+
+        const helmetCrest = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.04, 0.36), helmetMat);
+        helmetCrest.position.set(0, 1.71, 0);
+        charGroup.add(helmetCrest);
+
+        const lampMount = new THREE.Mesh(
+          new THREE.BoxGeometry(0.08, 0.05, 0.03),
+          new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3 })
+        );
+        lampMount.position.set(0, 1.62, 0.195);
+        charGroup.add(lampMount);
+
+        const strapMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
+        const leftStrap = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.20, 0.01), strapMat);
+        leftStrap.position.set(-0.17, 1.44, 0.04);
+        charGroup.add(leftStrap);
+        const rightStrap = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.20, 0.01), strapMat);
+        rightStrap.position.set(0.17, 1.44, 0.04);
+        charGroup.add(rightStrap);
+
+      } else if (outfit === 'hijab') {
+        const hijabMat = new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.65 });
+        const hijabHood = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.40, 0.36), hijabMat);
+        hijabHood.position.set(0, 1.48, -0.03);
+        charGroup.add(hijabHood);
+
+        const foreheadBand = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.06, 0.04), hijabMat);
+        foreheadBand.position.set(0, 1.58, 0.15);
+        charGroup.add(foreheadBand);
+
+        const leftWrap = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.34, 0.12), hijabMat);
+        leftWrap.position.set(-0.17, 1.44, 0.11);
+        charGroup.add(leftWrap);
+        const rightWrap = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.34, 0.12), hijabMat);
+        rightWrap.position.set(0.17, 1.44, 0.11);
+        charGroup.add(rightWrap);
+
+        const chestDrape = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.28, 0.16), hijabMat);
+        chestDrape.position.set(0, 1.12, 0.11);
+        charGroup.add(chestDrape);
+
+      } else {
+        const hairMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.4 });
+        const hairTop = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.14, 0.35), hairMat);
+        hairTop.position.set(0, 1.62, -0.01);
+        charGroup.add(hairTop);
+
+        const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.365, 0.22, 0.16), hairMat);
+        hairBack.position.set(0, 1.48, -0.10);
+        charGroup.add(hairBack);
+      }
+
+      // 4. ARTICULATED ARMS
+      const leftArm = new THREE.Group();
+      leftArm.position.set(-0.32, 1.15, 0);
+      const leftSleeveGeo = new THREE.BoxGeometry(0.14, 0.36, 0.14);
+      leftSleeveGeo.translate(0, -0.18, 0);
+      const leftSleeve = new THREE.Mesh(leftSleeveGeo, clothesMat);
+      leftArm.add(leftSleeve);
+
+      const leftHandGeo = new THREE.BoxGeometry(0.11, 0.14, 0.11);
+      leftHandGeo.translate(0, -0.43, 0);
+      const leftHand = new THREE.Mesh(leftHandGeo, skinMat);
+      leftArm.add(leftHand);
+      charGroup.add(leftArm);
+
+      const rightArm = new THREE.Group();
+      rightArm.position.set(0.32, 1.15, 0);
+      const rightSleeveGeo = new THREE.BoxGeometry(0.14, 0.36, 0.14);
+      rightSleeveGeo.translate(0, -0.18, 0);
+      const rightSleeve = new THREE.Mesh(rightSleeveGeo, clothesMat);
+      rightArm.add(rightSleeve);
+
+      const rightHandGeo = new THREE.BoxGeometry(0.11, 0.14, 0.11);
+      rightHandGeo.translate(0, -0.43, 0);
+      const rightHand = new THREE.Mesh(rightHandGeo, skinMat);
+      rightArm.add(rightHand);
+      charGroup.add(rightArm);
+
+      // 5. ARTICULATED LEGS
+      function buildVisitorLeg(offsetX) {
+        const legGroup = new THREE.Group();
+        legGroup.position.set(offsetX, 0.65, 0);
+
+        const legGeo = new THREE.BoxGeometry(0.18, 0.52, 0.20);
+        legGeo.translate(0, -0.26, 0);
+        const legMesh = new THREE.Mesh(legGeo, pantsMat);
+        legMesh.castShadow = true;
+        legGroup.add(legMesh);
+
+        const shoeGeo = new THREE.BoxGeometry(0.185, 0.14, 0.28);
+        shoeGeo.translate(0, -0.58, 0.04);
+        const shoeMesh = new THREE.Mesh(shoeGeo, shoesMat);
+        legGroup.add(shoeMesh);
+
+        return legGroup;
+      }
+
+      const leftLeg = buildVisitorLeg(-0.14);
+      charGroup.add(leftLeg);
+      const rightLeg = buildVisitorLeg(0.14);
+      charGroup.add(rightLeg);
+
+      charGroup.userData.leftArm = leftArm;
+      charGroup.userData.rightArm = rightArm;
+      charGroup.userData.leftLeg = leftLeg;
+      charGroup.userData.rightLeg = rightLeg;
+
+      return charGroup;
+    }
+
+    function createVisitorHud(visitor) {
+      const container = document.createElement('div');
+      container.className = `visitor-hud ${visitor.isSelf ? 'visitor-hud-self' : 'visitor-hud-other'}`;
+      container.id = `visitor-hud-${visitor.id}`;
+
+      if (visitor.isSelf) {
+        container.innerHTML = `
+          <div class="hud-pill flex items-center gap-1.5 px-2.5 py-1 rounded-full shadow-lg">
+            <span class="text-xs">⭐</span>
+            <span class="font-bold text-amber-300 text-[11px] tracking-tight whitespace-nowrap hud-visitor-name">${visitor.name}</span>
+            <span class="bg-amber-400 text-slate-950 font-black text-[8.5px] px-1 rounded uppercase tracking-wider">Anda</span>
+          </div>
+          <div class="visitor-act-pill text-[9px] font-semibold text-amber-100/90 mt-0.5 hud-visitor-act">
+            ${visitor.currentActivity || 'Berkunjung'}
+          </div>
+        `;
+        container.onclick = (e) => {
+          e.stopPropagation();
+          openVisitorModal();
+        };
+      } else {
+        container.innerHTML = `
+          <div class="hud-pill flex items-center gap-1.5 px-2.5 py-1 rounded-full shadow-lg">
+            <i class="ph ph-user text-cyan-400 text-xs"></i>
+            <span class="font-bold text-cyan-200 text-[11px] tracking-tight whitespace-nowrap hud-visitor-name">${visitor.name}</span>
+          </div>
+          <div class="visitor-act-pill text-[9px] font-semibold text-slate-300 mt-0.5 hud-visitor-act">
+            ${visitor.currentActivity || 'Berkunjung'}
+          </div>
+        `;
+        container.onclick = (e) => {
+          e.stopPropagation();
+          focusOnVisitor(visitor.id);
+        };
+      }
+
+      const hudObj = new THREE.CSS2DObject(container);
+      hudObj.position.set(0, 2.15, 0);
+      return hudObj;
+    }
+
+    function updateVisitorHud(visitor) {
+      const el = document.getElementById(`visitor-hud-${visitor.id}`);
+      if (!el) return;
+      const nameEl = el.querySelector('.hud-visitor-name');
+      if (nameEl) nameEl.textContent = visitor.name;
+      const actEl = el.querySelector('.hud-visitor-act');
+      if (actEl) actEl.textContent = visitor.currentActivity || 'Berkunjung';
+    }
+
+    function applyVisitorSittingPose(mesh, heading) {
+      mesh.position.y = -0.22;
+      mesh.rotation.y = heading;
+      mesh.userData.isSitting = true;
+      if (mesh.userData.leftLeg) {
+        mesh.userData.leftLeg.rotation.set(-Math.PI / 2, 0, 0.08);
+      }
+      if (mesh.userData.rightLeg) {
+        mesh.userData.rightLeg.rotation.set(-Math.PI / 2, 0, -0.08);
+      }
+      if (mesh.userData.leftArm) {
+        mesh.userData.leftArm.rotation.set(-0.45, 0, 0.2);
+      }
+      if (mesh.userData.rightArm) {
+        mesh.userData.rightArm.rotation.set(-0.45, 0, -0.2);
+      }
+    }
+
+    function applyVisitorStandingPose(mesh) {
+      mesh.position.y = 0;
+      mesh.userData.isSitting = false;
+      if (mesh.userData.leftLeg) mesh.userData.leftLeg.rotation.set(0, 0, 0);
+      if (mesh.userData.rightLeg) mesh.userData.rightLeg.rotation.set(0, 0, 0);
+      if (mesh.userData.leftArm) mesh.userData.leftArm.rotation.set(0, 0, 0);
+      if (mesh.userData.rightArm) mesh.userData.rightArm.rotation.set(0, 0, 0);
+    }
+
+    function startVisitorWalk(visitor, destX, destZ, destHeading, nextState, nextAct, dwellTime, isSitting) {
+      applyVisitorStandingPose(visitor.mesh);
+      visitor.destHeading = destHeading;
+      visitor.nextState = nextState;
+      visitor.nextAct = nextAct;
+      visitor.nextDwell = dwellTime;
+      visitor.nextSitting = !!isSitting;
+      visitor.currentActivity = `Menuju: ${nextAct}`;
+      visitor.state = 'WALKING';
+
+      visitor.navPath = findNavPath({ x: visitor.curX, z: visitor.curZ }, { x: destX, z: destZ });
+      visitor.navIdx = 0;
+      if (visitor.navPath && visitor.navPath.length > 0) {
+        visitor.targetX = visitor.navPath[0].x;
+        visitor.targetZ = visitor.navPath[0].z;
+      } else {
+        visitor.targetX = destX;
+        visitor.targetZ = destZ;
+      }
+      visitor.stateTimer = 40;
+      updateVisitorHud(visitor);
+    }
+
+    function spawnVisitorInScene(visitorData) {
+      const mesh = buildVisitorCharacterMesh(visitorData);
+      mesh.position.set(visitorData.curX, 0, visitorData.curZ);
+      mesh.rotation.y = visitorData.heading || 0;
+      scene.add(mesh);
+
+      const hud = createVisitorHud(visitorData);
+      mesh.add(hud);
+
+      visitorData.mesh = mesh;
+      visitorData.hud = hud;
+      visitorData.walkCycle = Math.random() * 10;
+
+      if (visitorData.isSitting) {
+        applyVisitorSittingPose(mesh, visitorData.heading || 0);
+      }
+
+      window.VISITOR_ROSTER.push(visitorData);
+      updateLiveVisitorsCounter();
+      return visitorData;
+    }
+
+    function updateLiveVisitorsCounter() {
+      const el = document.getElementById('header-live-visitors-count');
+      if (el) el.textContent = window.VISITOR_ROSTER.length.toString();
+    }
+
+    function updateVisitorSimulation(delta, clockTicker) {
+      window.VISITOR_ROSTER.forEach((v) => {
+        v.stateTimer -= delta;
+
+        if (v.stateTimer <= 0) {
+          if (v.state !== 'WALKING') {
+            // Pick a destination different from current
+            const available = VISITOR_DESTINATIONS.filter(d => Math.hypot(d.x - v.curX, d.z - v.curZ) > 1.8);
+            const picked = available[Math.floor(Math.random() * available.length)] || VISITOR_DESTINATIONS[0];
+            startVisitorWalk(v, picked.x, picked.z, picked.heading, picked.state, picked.act, picked.dwellTime, picked.isSitting);
+          } else {
+            // Failsafe timeout: arrive
+            v.curX = v.targetX;
+            v.curZ = v.targetZ;
+            v.mesh.position.set(v.curX, 0, v.curZ);
+            v.state = v.nextState || 'IDLE';
+            v.currentActivity = v.nextAct || 'Berkunjung';
+            v.stateTimer = v.nextDwell || (12 + Math.random() * 8);
+            if (v.nextSitting) {
+              applyVisitorSittingPose(v.mesh, v.destHeading || 0);
+            } else {
+              applyVisitorStandingPose(v.mesh);
+            }
+            updateVisitorHud(v);
+          }
+        }
+
+        if (v.state === 'WALKING') {
+          const dx = v.targetX - v.curX;
+          const dz = v.targetZ - v.curZ;
+          const dist = Math.hypot(dx, dz);
+
+          if (dist > 0.12) {
+            const walkSpeed = 2.2 * delta;
+            const moveStep = Math.min(walkSpeed, dist);
+            v.curX += (dx / dist) * moveStep;
+            v.curZ += (dz / dist) * moveStep;
+            v.mesh.position.set(v.curX, 0, v.curZ);
+
+            const targetHeading = Math.atan2(dx, dz);
+            let diff = targetHeading - v.heading;
+            while (diff < -Math.PI) diff += Math.PI * 2;
+            while (diff > Math.PI) diff -= Math.PI * 2;
+            v.heading += diff * Math.min(1, 8.0 * delta);
+            v.mesh.rotation.y = v.heading;
+
+            v.walkCycle += delta * 7.5;
+            const swing = Math.sin(v.walkCycle) * 0.45;
+            if (v.mesh.userData.leftLeg) v.mesh.userData.leftLeg.rotation.x = swing;
+            if (v.mesh.userData.rightLeg) v.mesh.userData.rightLeg.rotation.x = -swing;
+            if (v.mesh.userData.leftArm) v.mesh.userData.leftArm.rotation.x = -swing * 0.8;
+            if (v.mesh.userData.rightArm) v.mesh.userData.rightArm.rotation.x = swing * 0.8;
+            if (v.mesh.userData.torso) v.mesh.userData.torso.position.y = 0.95 + Math.abs(Math.sin(v.walkCycle)) * 0.035;
+
+          } else {
+            // Next waypoint in navPath
+            if (v.navPath && v.navIdx < v.navPath.length - 1) {
+              v.navIdx++;
+              v.targetX = v.navPath[v.navIdx].x;
+              v.targetZ = v.navPath[v.navIdx].z;
+            } else {
+              // Reached final destination
+              v.state = v.nextState || 'IDLE';
+              v.curX = v.targetX;
+              v.curZ = v.targetZ;
+              v.mesh.position.set(v.curX, 0, v.curZ);
+              v.stateTimer = v.nextDwell || (12 + Math.random() * 8);
+              v.currentActivity = v.nextAct || 'Berkunjung';
+              v.heading = v.destHeading !== undefined ? v.destHeading : v.heading;
+              v.mesh.rotation.y = v.heading;
+
+              if (v.nextSitting) {
+                applyVisitorSittingPose(v.mesh, v.heading);
+              } else {
+                applyVisitorStandingPose(v.mesh);
+              }
+
+              // Special: If visitor arrives at Mbak Kara's reception desk, Mbak Kara greets politely!
+              if (v.state === 'RECEPTION' && typeof triggerKaraGreeting === 'function') {
+                triggerKaraGreeting('visitor');
+              }
+
+              updateVisitorHud(v);
+            }
+          }
+        }
+      });
+    }
+
+    function initVisitorPresenceSystem() {
+      // 1. Retrieve or generate self identity
+      const savedGuestName = localStorage.getItem('kopkar_guest_name') || `Tamu #${Math.floor(100 + Math.random() * 900)}`;
+      const savedGuestOutfit = localStorage.getItem('kopkar_guest_outfit') || 'safety_vest';
+      const savedGuestId = localStorage.getItem('kopkar_guest_id') || `guest_${Math.random().toString(36).substring(2, 8)}`;
+      localStorage.setItem('kopkar_guest_id', savedGuestId);
+      localStorage.setItem('kopkar_guest_name', savedGuestName);
+      localStorage.setItem('kopkar_guest_outfit', savedGuestOutfit);
+
+      window.VISITOR_SYSTEM.selectedOutfit = savedGuestOutfit;
+
+      // Update header button label
+      const headerNameEl = document.getElementById('header-self-visitor-name');
+      if (headerNameEl) headerNameEl.textContent = savedGuestName;
+
+      // 2. Murni Hanya Pengunjung Riil (Tanpa NPC Fiktif/Simulasi)
+      // Hanya tamu asli yang membuka web ini yang akan ditampilkan di ruangan 3D.
+
+      // 3. Spawn Self Visitor Avatar starting near entrance
+      const selfVisitor = {
+        id: savedGuestId,
+        name: savedGuestName,
+        outfit: savedGuestOutfit,
+        isSelf: true,
+        curX: -11.0,
+        curZ: -1.0,
+        heading: 0,
+        state: 'WALKING',
+        stateTimer: 30,
+        currentActivity: 'Masuk melalui Pintu Utama'
+      };
+
+      spawnVisitorInScene(selfVisitor);
+      window.VISITOR_SYSTEM.self = selfVisitor;
+
+      // Walk self avatar from entrance towards Reception desk
+      setTimeout(() => {
+        startVisitorWalk(selfVisitor, -8.7, -1.0, -Math.PI / 2, 'RECEPTION', 'Menyapa Resepsionis Mbak Kara', 14, false);
+      }, 1000);
+
+      // 4. Setup BroadcastChannel for zero-latency multi-tab sync
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          window.VISITOR_SYSTEM.channel = new BroadcastChannel('kopkar_virtual_office_presence');
+          
+          window.VISITOR_SYSTEM.channel.onmessage = (event) => {
+            const data = event.data;
+            if (!data || !data.id || data.id === window.VISITOR_SYSTEM.self.id) return;
+
+            if (data.type === 'leave') {
+              const idx = window.VISITOR_ROSTER.findIndex(v => v.id === data.id);
+              if (idx !== -1) {
+                const rem = window.VISITOR_ROSTER[idx];
+                if (rem.mesh) scene.remove(rem.mesh);
+                window.VISITOR_ROSTER.splice(idx, 1);
+                updateLiveVisitorsCounter();
+              }
+            } else if (data.type === 'hello') {
+              // Kirim heartbeat balik agar pengunjung baru langsung tahu posisi kita
+              const s = window.VISITOR_SYSTEM.self;
+              if (s && window.VISITOR_SYSTEM.channel) {
+                window.VISITOR_SYSTEM.channel.postMessage({
+                  type: 'heartbeat',
+                  id: s.id,
+                  name: s.name,
+                  outfit: s.outfit,
+                  curX: s.curX,
+                  curZ: s.curZ,
+                  heading: s.heading,
+                  act: s.currentActivity,
+                  state: s.state
+                });
+              }
+            } else if (data.type === 'heartbeat' || data.type === 'update') {
+              let existing = window.VISITOR_ROSTER.find(v => v.id === data.id);
+              if (existing) {
+                existing.name = data.name;
+                existing.currentActivity = data.act;
+                existing.lastSeen = Date.now();
+                updateVisitorHud(existing);
+              } else {
+                // Tamu asli baru bergabung (dari tab / jendela / sesi browser lain)
+                const remoteVisitor = {
+                  id: data.id,
+                  name: data.name,
+                  outfit: data.outfit || 'safety_vest',
+                  isSelf: false,
+                  curX: data.curX || -11.0,
+                  curZ: data.curZ || -1.0,
+                  heading: data.heading || 0,
+                  state: data.state || 'WALKING',
+                  stateTimer: 20,
+                  currentActivity: data.act || 'Berkunjung',
+                  lastSeen: Date.now()
+                };
+                spawnVisitorInScene(remoteVisitor);
+                showToastNotification(`👤 <strong>Tamu Baru Hadir:</strong> ${data.name}`);
+              }
+            }
+          };
+
+          // Sapukan pengumuman hadir saat baru membuka halaman
+          window.VISITOR_SYSTEM.channel.postMessage({
+            type: 'hello',
+            id: selfVisitor.id,
+            name: selfVisitor.name,
+            outfit: selfVisitor.outfit
+          });
+
+          // Bersihkan tamu remote yang sudah tidak aktif (stale timeout 8 detik)
+          setInterval(() => {
+            const now = Date.now();
+            for (let i = window.VISITOR_ROSTER.length - 1; i >= 0; i--) {
+              const v = window.VISITOR_ROSTER[i];
+              if (!v.isSelf && v.lastSeen && (now - v.lastSeen > 8000)) {
+                if (v.mesh) scene.remove(v.mesh);
+                window.VISITOR_ROSTER.splice(i, 1);
+                updateLiveVisitorsCounter();
+              }
+            }
+          }, 4000);
+
+          // Periodic broadcast of self presence
+          setInterval(() => {
+            const s = window.VISITOR_SYSTEM.self;
+            if (s && window.VISITOR_SYSTEM.channel) {
+              window.VISITOR_SYSTEM.channel.postMessage({
+                type: 'heartbeat',
+                id: s.id,
+                name: s.name,
+                outfit: s.outfit,
+                curX: s.curX,
+                curZ: s.curZ,
+                heading: s.heading,
+                act: s.currentActivity,
+                state: s.state
+              });
+            }
+          }, 2500);
+
+          window.addEventListener('beforeunload', () => {
+            if (window.VISITOR_SYSTEM.channel && window.VISITOR_SYSTEM.self) {
+              window.VISITOR_SYSTEM.channel.postMessage({
+                type: 'leave',
+                id: window.VISITOR_SYSTEM.self.id
+              });
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('BroadcastChannel not supported or error:', e);
+      }
+    }
+
+    /* MODAL UI HANDLERS */
+    function openVisitorModal() {
+      const m = document.getElementById('modal-visitor-identity');
+      if (!m) return;
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+
+      const s = window.VISITOR_SYSTEM.self;
+      if (s) {
+        const inp = document.getElementById('input-visitor-name');
+        if (inp) inp.value = s.name;
+        selectOutfitChoice(s.outfit || 'safety_vest');
+      }
+    }
+
+    function closeVisitorModal() {
+      const m = document.getElementById('modal-visitor-identity');
+      if (m) {
+        m.classList.add('hidden');
+        m.classList.remove('flex');
+      }
+    }
+
+    function selectOutfitChoice(outfitKey) {
+      window.VISITOR_SYSTEM.selectedOutfit = outfitKey;
+      document.querySelectorAll('#outfit-picker-grid .outfit-choice-card').forEach(btn => {
+        const isSelected = btn.getAttribute('data-outfit') === outfitKey;
+        const checkDot = btn.querySelector('.check-dot');
+        if (isSelected) {
+          btn.classList.add('border-amber-500', 'bg-amber-500/10');
+          btn.classList.remove('border-white/10', 'bg-slate-950/60');
+          if (checkDot) {
+            checkDot.className = 'w-4 h-4 rounded-full border border-amber-400 bg-amber-400 flex items-center justify-center check-dot text-[9px] text-slate-950 font-black';
+            checkDot.textContent = '✓';
+          }
+        } else {
+          btn.classList.remove('border-amber-500', 'bg-amber-500/10');
+          btn.classList.add('border-white/10', 'bg-slate-950/60');
+          if (checkDot) {
+            checkDot.className = 'w-4 h-4 rounded-full border border-white/20 bg-transparent flex items-center justify-center check-dot text-[9px] text-transparent';
+            checkDot.textContent = '';
+          }
+        }
+      });
+    }
+
+    function setQuickName(name) {
+      const inp = document.getElementById('input-visitor-name');
+      if (inp) inp.value = name;
+    }
+
+    function setRandomGuestName() {
+      const randNum = Math.floor(100 + Math.random() * 900);
+      setQuickName(`Tamu #${randNum}`);
+    }
+
+    function setRolePrefix(role) {
+      const randNum = Math.floor(10 + Math.random() * 90);
+      setQuickName(`${role} #${randNum}`);
+    }
+
+    function saveVisitorIdentity() {
+      const inp = document.getElementById('input-visitor-name');
+      const newName = (inp && inp.value.trim()) ? inp.value.trim() : `Tamu #${Math.floor(100 + Math.random() * 900)}`;
+      const newOutfit = window.VISITOR_SYSTEM.selectedOutfit || 'safety_vest';
+
+      localStorage.setItem('kopkar_guest_name', newName);
+      localStorage.setItem('kopkar_guest_outfit', newOutfit);
+
+      const s = window.VISITOR_SYSTEM.self;
+      if (s) {
+        s.name = newName;
+        const outfitChanged = s.outfit !== newOutfit;
+        s.outfit = newOutfit;
+
+        const headerNameEl = document.getElementById('header-self-visitor-name');
+        if (headerNameEl) headerNameEl.textContent = newName;
+
+        if (outfitChanged && s.mesh) {
+          // Rebuild mesh with new outfit
+          const curP = s.mesh.position.clone();
+          const curR = s.mesh.rotation.y;
+          scene.remove(s.mesh);
+
+          const newMesh = buildVisitorCharacterMesh(s);
+          newMesh.position.copy(curP);
+          newMesh.rotation.y = curR;
+          scene.add(newMesh);
+
+          const hud = createVisitorHud(s);
+          newMesh.add(hud);
+
+          s.mesh = newMesh;
+          s.hud = hud;
+        } else {
+          updateVisitorHud(s);
+        }
+
+        // Broadcast update to other tabs
+        if (window.VISITOR_SYSTEM.channel) {
+          window.VISITOR_SYSTEM.channel.postMessage({
+            type: 'update',
+            id: s.id,
+            name: s.name,
+            outfit: s.outfit,
+            curX: s.curX,
+            curZ: s.curZ,
+            heading: s.heading,
+            act: s.currentActivity,
+            state: s.state
+          });
+        }
+      }
+
+      closeVisitorModal();
+      showToastNotification(`⭐ Identitas karakter berhasil diperbarui: <b>${newName}</b>!`);
+    }
+
+    function focusOnSelfAvatar() {
+      closeVisitorModal();
+      const s = window.VISITOR_SYSTEM.self;
+      if (s && s.mesh) {
+        const p = s.mesh.position;
+        gsap.to(controls.target, { x: p.x, y: 1.2, z: p.z, duration: 1.2, ease: 'power2.inOut' });
+        gsap.to(camera.position, { x: p.x - 3.2, y: 2.6, z: p.z + 3.8, duration: 1.2, ease: 'power2.inOut' });
+        showToastNotification(`🎯 Kamera menyorot karakter Anda (<b>${s.name}</b>)`);
+      }
+    }
+
+    function focusOnVisitor(id) {
+      const v = window.VISITOR_ROSTER.find(item => item.id === id);
+      if (!v || !v.mesh) return;
+      const p = v.mesh.position;
+      gsap.to(controls.target, { x: p.x, y: 1.2, z: p.z, duration: 1.2, ease: 'power2.inOut' });
+      gsap.to(camera.position, { x: p.x - 3.2, y: 2.6, z: p.z + 3.6, duration: 1.2, ease: 'power2.inOut' });
+      showToastNotification(`👤 Mengikuti pengunjung: <b>${v.name}</b> (${v.currentActivity})`);
+    }
+
+    function teleportSelfToEntrance() {
+      closeVisitorModal();
+      const s = window.VISITOR_SYSTEM.self;
+      if (s) {
+        s.curX = -11.0;
+        s.curZ = -1.0;
+        s.heading = 0;
+        if (s.mesh) {
+          s.mesh.position.set(s.curX, 0, s.curZ);
+          s.mesh.rotation.y = 0;
+        }
+        startVisitorWalk(s, -8.7, -1.0, -Math.PI / 2, 'RECEPTION', 'Menyapa Resepsionis Mbak Kara', 14, false);
+        focusOnSelfAvatar();
+        showToastNotification(`🚪 Karakter Anda masuk dari pintu depan.`);
+      }
+    }
+
+
     /* =====================================================================
        DIGITAL RECEPTION & MEMBER SERVICE CONTROLLER
        ===================================================================== */
@@ -9035,6 +10044,133 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+
+  <!-- MODAL: BUKU TAMU & PERSONALISASI AVATAR 3D (VERSI 1 REALTIME) -->
+  <div id="modal-visitor-identity" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-fade-in">
+    <div class="glass-panel w-full max-w-lg rounded-3xl p-5 sm:p-6 border border-amber-500/30 shadow-2xl relative overflow-hidden bg-slate-900/95 max-h-[90vh] overflow-y-auto custom-scroll">
+      
+      <!-- Close button -->
+      <button onclick="closeVisitorModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-all">
+        <i class="ph ph-x text-sm"></i>
+      </button>
+
+      <!-- Header -->
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 text-2xl shrink-0 shadow-lg shadow-amber-500/10">
+          <i class="ph ph-identification-card"></i>
+        </div>
+        <div>
+          <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <span>Buku Tamu Digital & Avatar 3D</span>
+            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-mono border border-emerald-500/30">Live Realtime</span>
+          </h3>
+          <p class="text-xs text-slate-400">Atur nama dan penampilan karakter Anda di kantor virtual Kopkar Adaro.</p>
+        </div>
+      </div>
+
+      <!-- Form Inputs -->
+      <div class="space-y-4">
+        
+        <!-- Input Nama -->
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+            <span>Nama / Identitas Tamu:</span>
+            <span class="text-[10px] text-amber-400 font-normal">Muncul di atas kepala karakter</span>
+          </label>
+          <div class="relative">
+            <input type="text" id="input-visitor-name" maxlength="28" placeholder="Ketik nama asli Anda di sini (contoh: Pak Joko, Rahmat, dll)" class="w-full bg-slate-950/80 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition-all pr-10">
+            <i class="ph ph-user-circle absolute right-3.5 top-3 text-slate-400 text-base"></i>
+          </div>
+
+          <!-- Quick Name Suggestions -->
+          <div class="flex items-center gap-1.5 mt-2 flex-wrap text-[11px]">
+            <span class="text-slate-400 text-[10px]">Format Cepat:</span>
+            <button type="button" onclick="setRandomGuestName()" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 hover:text-amber-300 text-slate-300 border border-white/10 transition-all">🏷️ Nomor Tamu Acak</button>
+            <button type="button" onclick="setRolePrefix('Karyawan Site')" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 hover:text-amber-300 text-slate-300 border border-white/10 transition-all">👷 Karyawan Site</button>
+            <button type="button" onclick="setRolePrefix('Anggota Koperasi')" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 hover:text-amber-300 text-slate-300 border border-white/10 transition-all">👔 Anggota Kopkar</button>
+          </div>
+        </div>
+
+        <!-- Pilihan Kostum / Gaya Karakter -->
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+            Pilih Pakaian Karakter (Outfit):
+          </label>
+          <div class="grid grid-cols-2 gap-2.5" id="outfit-picker-grid">
+            
+            <!-- 1. Safety Vest Adaro -->
+            <button type="button" onclick="selectOutfitChoice('safety_vest')" data-outfit="safety_vest" class="outfit-choice-card text-left p-3 rounded-2xl border-2 border-amber-500 bg-amber-500/10 hover:bg-amber-500/20 transition-all flex flex-col gap-1 cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-lg">👷</span>
+                <span class="w-4 h-4 rounded-full border border-amber-400 bg-amber-400 flex items-center justify-center check-dot text-[9px] text-slate-950 font-black">✓</span>
+              </div>
+              <span class="text-xs font-bold text-white">Rompi K3 & Helm Safety</span>
+              <span class="text-[10px] text-slate-300 leading-tight">Seragam lapangan / tambang Adaro oranye terang &amp; helm kuning.</span>
+            </button>
+
+            <!-- 2. Batik Nusantara -->
+            <button type="button" onclick="selectOutfitChoice('batik')" data-outfit="batik" class="outfit-choice-card text-left p-3 rounded-2xl border-2 border-white/10 bg-slate-950/60 hover:bg-white/10 transition-all flex flex-col gap-1 cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-lg">👔</span>
+                <span class="w-4 h-4 rounded-full border border-white/20 bg-transparent flex items-center justify-center check-dot text-[9px] text-transparent">✓</span>
+              </div>
+              <span class="text-xs font-bold text-white">Batik Nusantara</span>
+              <span class="text-[10px] text-slate-400 leading-tight">Kemeja motif batik cokelat resmi &amp; celana formal gelap.</span>
+            </button>
+
+            <!-- 3. Smart Casual -->
+            <button type="button" onclick="selectOutfitChoice('smart_casual')" data-outfit="smart_casual" class="outfit-choice-card text-left p-3 rounded-2xl border-2 border-white/10 bg-slate-950/60 hover:bg-white/10 transition-all flex flex-col gap-1 cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-lg">👕</span>
+                <span class="w-4 h-4 rounded-full border border-white/20 bg-transparent flex items-center justify-center check-dot text-[9px] text-transparent">✓</span>
+              </div>
+              <span class="text-xs font-bold text-white">Smart Casual</span>
+              <span class="text-[10px] text-slate-400 leading-tight">Polo shirt teal modern, celana chino &amp; sepatu kets putih.</span>
+            </button>
+
+            <!-- 4. Hijab Syari -->
+            <button type="button" onclick="selectOutfitChoice('hijab')" data-outfit="hijab" class="outfit-choice-card text-left p-3 rounded-2xl border-2 border-white/10 bg-slate-950/60 hover:bg-white/10 transition-all flex flex-col gap-1 cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-lg">🧕</span>
+                <span class="w-4 h-4 rounded-full border border-white/20 bg-transparent flex items-center justify-center check-dot text-[9px] text-transparent">✓</span>
+              </div>
+              <span class="text-xs font-bold text-white">Muslimah Syari</span>
+              <span class="text-[10px] text-slate-400 leading-tight">Gamis anggun pastel rose dengan hijab khimar bertingkat.</span>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Info Realtime Crowd -->
+        <div class="p-3 rounded-2xl bg-indigo-950/40 border border-indigo-500/25 flex items-center gap-2.5 text-xs text-indigo-200">
+          <i class="ph ph-broadcast text-lg text-emerald-400 shrink-0 animate-pulse"></i>
+          <div>
+            <span class="font-bold text-white">Sinkronisasi Realtime Aktif:</span>
+            <span class="text-[11px] text-slate-300 block">Karakter Anda dan tamu lain langsung terlihat berkunjung, menyapa Mbak Kara, dan jalan-jalan di kantor virtual.</span>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="pt-2 flex flex-col sm:flex-row gap-2">
+          <button type="button" onclick="saveVisitorIdentity()" class="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20 transition-all">
+            <i class="ph ph-check-circle text-base"></i>
+            <span>Simpan &amp; Terapkan</span>
+          </button>
+          
+          <button type="button" onclick="focusOnSelfAvatar()" class="py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs flex items-center justify-center gap-1.5 border border-white/15 transition-all">
+            <span>🎯 Sorot Karakter Saya</span>
+          </button>
+
+          <button type="button" onclick="teleportSelfToEntrance()" class="py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-1.5 border border-white/15 transition-all" title="Mulai jalan dari pintu masuk depan">
+            <span>🚪 Masuk Ulang</span>
+          </button>
+        </div>
+
+      </div>
+
     </div>
   </div>
 
