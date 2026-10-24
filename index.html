@@ -7238,11 +7238,13 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 
     function focusPreset(presetKey) {
         if (presetKey === 'my-avatar') {
-          if (window.VISITOR_SYSTEM && window.VISITOR_SYSTEM.self && window.VISITOR_SYSTEM.self.mesh) {
-            const p = window.VISITOR_SYSTEM.self.mesh.position;
-            gsap.to(controls.target, { x: p.x, y: 1.2, z: p.z, duration: 1.2, ease: 'power2.inOut' });
-            gsap.to(camera.position, { x: p.x - 3.2, y: 2.6, z: p.z + 3.8, duration: 1.2, ease: 'power2.inOut' });
+          if (window.VISITOR_SYSTEM && window.VISITOR_SYSTEM.self) {
+            startThirdPersonFollow(window.VISITOR_SYSTEM.self);
             return;
+          }
+        } else {
+          if (typeof exitThirdPersonMode === 'function') {
+            exitThirdPersonMode(true);
           }
         }
         if (presetKey === 'waiting-lounge') {
@@ -7830,6 +7832,11 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       // Realtime Dynamic Visitors & Self Avatar Simulation (Multi-User)
       if (typeof updateVisitorSimulation === 'function') {
         updateVisitorSimulation(delta, clockTicker);
+      }
+
+      // 3rd Person View Camera Follow System (Sudut Pandang Orang Ketiga)
+      if (typeof updateThirdPersonCamera === 'function') {
+        updateThirdPersonCamera(delta);
       }
 
 
@@ -8841,24 +8848,207 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       showToastNotification(`⭐ Identitas karakter berhasil diperbarui: <b>${newName}</b>!`);
     }
 
+        /* =====================================================================
+       3RD PERSON VIEW & CAMERA FOLLOW SYSTEM (SUDUT PANDANG ORANG KETIGA)
+       Kamera otomatis melayang di belakang pundak avatar, mengikuti setiap
+       langkah dan arah pandangan karakter saat berjalan di kantor virtual.
+       ===================================================================== */
+    window.THIRD_PERSON_STATE = {
+      active: false,
+      targetChar: null,
+      distance: 2.7,
+      height: 1.85,
+      shoulderOffset: 0.28,  // Over-the-shoulder offset kanan
+      lookAheadDist: 1.8,    // Titik fokus di depan mata karakter
+      smoothFactor: 4.5,
+      autoAlign: true,       // Mengunci kamera otomatis di belakang punggung
+      isTransitioning: false,
+      userOrbitAngle: 0
+    };
+
+    function startThirdPersonFollow(character) {
+      if (!character || !character.mesh) return;
+
+      const state = window.THIRD_PERSON_STATE;
+      state.active = true;
+      state.targetChar = character;
+      state.isTransitioning = true;
+      state.autoAlign = true;
+
+      // Izinkan jarak kamera lebih dekat untuk sudut pandang orang ketiga
+      if (controls) {
+        controls.minDistance = 0.5;
+        controls.maxDistance = 50;
+      }
+
+      // Perbarui label dropdown kamera di header
+      const labelEl = document.getElementById('label-camera-preset');
+      if (labelEl) labelEl.innerText = `3rd Person (${character.name})`;
+
+      // Tampilkan HUD indikator 3rd person
+      showThirdPersonHud(character);
+
+      // Hitung posisi ideal awal di belakang karakter
+      const h = character.heading || 0;
+      const isSit = character.isSitting || (character.mesh && character.mesh.userData && character.mesh.userData.isSitting);
+      const dist = isSit ? 2.2 : state.distance;
+      const hgt = isSit ? 1.45 : state.height;
+
+      const targetX = character.curX + Math.sin(h) * state.lookAheadDist;
+      const targetZ = character.curZ + Math.cos(h) * state.lookAheadDist;
+      const targetY = isSit ? 1.05 : 1.35;
+
+      const camX = character.curX - Math.sin(h) * dist + Math.cos(h) * state.shoulderOffset;
+      const camZ = character.curZ - Math.cos(h) * dist - Math.sin(h) * state.shoulderOffset;
+      const camY = hgt;
+
+      gsap.to(controls.target, {
+        x: targetX,
+        y: targetY,
+        z: targetZ,
+        duration: 1.2,
+        ease: 'power2.inOut'
+      });
+
+      gsap.to(camera.position, {
+        x: camX,
+        y: camY,
+        z: camZ,
+        duration: 1.2,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          state.isTransitioning = false;
+        }
+      });
+
+      showToastNotification(`🎥 <strong>3rd Person View Aktif:</strong> Kamera mengikuti pergerakan <b>${character.name}</b> dari belakang.`);
+    }
+
+    function exitThirdPersonMode(silent = false) {
+      const state = window.THIRD_PERSON_STATE;
+      if (!state.active) return;
+      state.active = false;
+      state.targetChar = null;
+      state.isTransitioning = false;
+
+      if (controls) {
+        controls.minDistance = 2.5;
+        controls.maxDistance = 55;
+      }
+
+      hideThirdPersonHud();
+
+      const labelEl = document.getElementById('label-camera-preset');
+      if (labelEl && labelEl.innerText.includes('3rd Person')) {
+        labelEl.innerText = 'Overview';
+      }
+
+      if (!silent) {
+        showToastNotification(`🎥 Kamera dilepas kembali ke Mode Pandangan Bebas.`);
+      }
+    }
+
+    function toggleThirdPersonLock() {
+      const state = window.THIRD_PERSON_STATE;
+      state.autoAlign = !state.autoAlign;
+
+      const btn = document.getElementById('btn-toggle-tpp-mode');
+      const label = document.getElementById('label-tpp-mode');
+      const icon = document.getElementById('icon-tpp-mode');
+
+      if (state.autoAlign) {
+        if (label) label.textContent = 'Kunci Belakang';
+        if (icon) icon.className = 'ph ph-lock-key text-xs';
+        if (btn) {
+          btn.classList.add('bg-amber-500/20', 'text-amber-200', 'border-amber-500/30');
+          btn.classList.remove('bg-cyan-500/20', 'text-cyan-200', 'border-cyan-500/30');
+        }
+        showToastNotification('🔒 Kamera dikunci menghadap ke arah jalan avatar.');
+      } else {
+        if (label) label.textContent = 'Putar Bebas';
+        if (icon) icon.className = 'ph ph-arrows-clockwise text-xs';
+        if (btn) {
+          btn.classList.remove('bg-amber-500/20', 'text-amber-200', 'border-amber-500/30');
+          btn.classList.add('bg-cyan-500/20', 'text-cyan-200', 'border-cyan-500/30');
+        }
+        showToastNotification('👁️ Geser layar untuk memutar sudut pandang di sekeliling avatar.');
+      }
+    }
+
+    function showThirdPersonHud(character) {
+      const el = document.getElementById('third-person-hud');
+      if (!el) return;
+      const nameEl = document.getElementById('third-person-target-name');
+      if (nameEl) nameEl.textContent = character.name;
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+    }
+
+    function hideThirdPersonHud() {
+      const el = document.getElementById('third-person-hud');
+      if (!el) return;
+      el.classList.add('hidden');
+      el.classList.remove('flex');
+    }
+
+    function updateThirdPersonCamera(delta) {
+      const state = window.THIRD_PERSON_STATE;
+      if (!state.active || !state.targetChar || !state.targetChar.mesh) return;
+      if (state.isTransitioning) return;
+
+      const char = state.targetChar;
+      const h = char.heading || 0;
+      const isSit = char.isSitting || (char.mesh.userData && char.mesh.userData.isSitting);
+
+      const dist = isSit ? 2.2 : state.distance;
+      const hgt = isSit ? 1.45 : state.height;
+
+      // Titik target tatapan: sedikit di depan kepala avatar
+      const idealTargetX = char.curX + Math.sin(h) * state.lookAheadDist;
+      const idealTargetZ = char.curZ + Math.cos(h) * state.lookAheadDist;
+      const idealTargetY = isSit ? 1.05 : 1.35;
+
+      const lerpSpeed = Math.min(1, delta * state.smoothFactor);
+
+      if (state.autoAlign) {
+        // Mode Kunci Belakang: Kamera persis berada di belakang pundak kanan karakter
+        const idealCamX = char.curX - Math.sin(h) * dist + Math.cos(h) * state.shoulderOffset;
+        const idealCamZ = char.curZ - Math.cos(h) * dist - Math.sin(h) * state.shoulderOffset;
+        const idealCamY = hgt;
+
+        camera.position.x += (idealCamX - camera.position.x) * lerpSpeed;
+        camera.position.y += (idealCamY - camera.position.y) * lerpSpeed;
+        camera.position.z += (idealCamZ - camera.position.z) * lerpSpeed;
+
+        controls.target.x += (idealTargetX - controls.target.x) * (lerpSpeed * 1.3);
+        controls.target.y += (idealTargetY - controls.target.y) * (lerpSpeed * 1.3);
+        controls.target.z += (idealTargetZ - controls.target.z) * (lerpSpeed * 1.3);
+      } else {
+        // Mode Putar Bebas: Target tetap mengikuti avatar saat berjalan, sudut pandang bebas diatur pengguna
+        const dx = char.curX - (controls.target.x - Math.sin(h) * state.lookAheadDist);
+        const dz = char.curZ - (controls.target.z - Math.cos(h) * state.lookAheadDist);
+
+        controls.target.x = char.curX + Math.sin(h) * state.lookAheadDist;
+        controls.target.y = idealTargetY;
+        controls.target.z = char.curZ + Math.cos(h) * state.lookAheadDist;
+
+        camera.position.x += dx;
+        camera.position.z += dz;
+      }
+    }
+
     function focusOnSelfAvatar() {
       closeVisitorModal();
       const s = window.VISITOR_SYSTEM.self;
       if (s && s.mesh) {
-        const p = s.mesh.position;
-        gsap.to(controls.target, { x: p.x, y: 1.2, z: p.z, duration: 1.2, ease: 'power2.inOut' });
-        gsap.to(camera.position, { x: p.x - 3.2, y: 2.6, z: p.z + 3.8, duration: 1.2, ease: 'power2.inOut' });
-        showToastNotification(`🎯 Kamera menyorot karakter Anda (<b>${s.name}</b>)`);
+        startThirdPersonFollow(s);
       }
     }
 
     function focusOnVisitor(id) {
       const v = window.VISITOR_ROSTER.find(item => item.id === id);
       if (!v || !v.mesh) return;
-      const p = v.mesh.position;
-      gsap.to(controls.target, { x: p.x, y: 1.2, z: p.z, duration: 1.2, ease: 'power2.inOut' });
-      gsap.to(camera.position, { x: p.x - 3.2, y: 2.6, z: p.z + 3.6, duration: 1.2, ease: 'power2.inOut' });
-      showToastNotification(`👤 Mengikuti pengunjung: <b>${v.name}</b> (${v.currentActivity})`);
+      startThirdPersonFollow(v);
     }
 
     function teleportSelfToEntrance() {
@@ -10347,8 +10537,9 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
             <span>Simpan &amp; Terapkan</span>
           </button>
           
-          <button type="button" onclick="focusOnSelfAvatar()" class="py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs flex items-center justify-center gap-1.5 border border-white/15 transition-all">
-            <span>🎯 Sorot Karakter Saya</span>
+          <button type="button" onclick="focusOnSelfAvatar()" class="py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-amber-500/25 to-amber-600/25 hover:from-amber-500/40 hover:to-amber-600/40 text-amber-200 hover:text-white font-bold text-xs flex items-center justify-center gap-2 border border-amber-500/50 transition-all shadow-lg shadow-amber-500/10 cursor-pointer" title="Ikuti karakter Anda dari sudut pandang orang ketiga (3rd Person View)">
+            <i class="ph ph-video-camera text-base text-amber-400"></i>
+            <span>🎥 3rd Person View (Ikuti Saya)</span>
           </button>
 
           <button type="button" onclick="teleportSelfToEntrance()" class="py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-1.5 border border-white/15 transition-all" title="Mulai jalan dari pintu masuk depan">
@@ -10359,6 +10550,25 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       </div>
 
     </div>
+  </div>
+
+  <!-- FLOATING 3RD PERSON CAMERA CONTROLLER (OVER-THE-SHOULDER FOLLOW) -->
+  <div id="third-person-hud" class="fixed top-16 sm:top-20 left-1/2 -translate-x-1/2 z-40 pointer-events-auto hidden items-center gap-2 glass-panel px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-amber-500/60 shadow-2xl bg-slate-950/90 backdrop-blur-md transition-all duration-300">
+    <span class="relative flex h-2.5 w-2.5 shrink-0">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-80"></span>
+      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+    </span>
+    <div class="flex items-center gap-1.5 text-xs font-bold text-amber-300 whitespace-nowrap">
+      <span>3rd Person:</span>
+      <span class="text-white font-semibold max-w-[110px] sm:max-w-[160px] truncate" id="third-person-target-name">Karakter</span>
+    </div>
+    <div class="h-4 w-[1px] bg-white/20 mx-0.5"></div>
+    <button id="btn-toggle-tpp-mode" onclick="toggleThirdPersonLock()" class="px-2 py-0.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-[10.5px] font-bold border border-amber-500/30 transition-all flex items-center gap-1 cursor-pointer" title="Ganti antara Kunci Belakang Karakter atau Putar Bebas">
+      <i class="ph ph-lock-key text-xs" id="icon-tpp-mode"></i> <span id="label-tpp-mode">Kunci Belakang</span>
+    </button>
+    <button onclick="exitThirdPersonMode()" class="px-2 py-0.5 rounded-lg bg-white/10 hover:bg-rose-500/30 hover:text-rose-200 text-slate-300 text-[10.5px] font-bold border border-white/15 transition-all flex items-center gap-1 cursor-pointer" title="Lepas kamera dan kembali ke pandangan bebas">
+      <i class="ph ph-x text-xs"></i> <span>Lepas Kamera</span>
+    </button>
   </div>
 
 </body>
