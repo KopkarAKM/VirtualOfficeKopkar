@@ -541,6 +541,12 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
         <span class="whitespace-nowrap">3rd Person</span>
       </button>
 
+      <!-- Quick Manual Control Toggle Button (Kendali Berjalan Bebas) -->
+      <button id="header-btn-manual-control" onclick="toggleManualControlMode()" class="glass-button px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1.5 text-amber-300 border border-amber-500/40 shadow-md hover:bg-amber-500/20 transition-all shrink-0 cursor-pointer" title="Kendalikan karakter sendiri dengan tombol WASD atau joystick ponsel">
+        <i class="ph ph-game-controller text-xs text-amber-400"></i>
+        <span id="header-label-manual-control" class="whitespace-nowrap">Kendali Manual</span>
+      </button>
+
     </div>
 
   </header>
@@ -8063,6 +8069,11 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
         updateVisitorSimulation(delta, clockTicker);
       }
 
+      // Manual Control System (WASD & Virtual Joystick Movement)
+      if (typeof updateManualControlSystem === 'function') {
+        updateManualControlSystem(delta);
+      }
+
       // 3rd Person View Camera Follow System (Sudut Pandang Orang Ketiga)
       if (typeof updateThirdPersonCamera === 'function') {
         updateThirdPersonCamera(delta);
@@ -8093,6 +8104,7 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       syncPresenceData();
       setInterval(syncPresenceData, 120000);
       initVisitorPresenceSystem();
+      initManualControlSystem();
     });
   
     
@@ -8708,6 +8720,10 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 
     function updateVisitorSimulation(delta, clockTicker) {
       window.VISITOR_ROSTER.forEach((v) => {
+        // Jika karakter sendiri sedang dikendalikan secara manual, serahkan kendali penuh ke updateManualControlSystem
+        if (v.isSelf && window.MANUAL_CONTROL && window.MANUAL_CONTROL.active) {
+          return;
+        }
         v.stateTimer -= delta;
 
         if (v.stateTimer <= 0) {
@@ -9399,6 +9415,499 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 
         camera.position.x += dx;
         camera.position.z += dz;
+      }
+    }
+
+    /* =====================================================================
+       MANUAL VISITOR CONTROL SYSTEM (WASD & ON-SCREEN VIRTUAL JOYSTICK)
+       Memungkinkan setiap pengunjung untuk mengendalikan karakter 3D mereka
+       secara manual berkeliling kantor virtual Kopkar AKM.
+       - Keyboard: W A S D / Tombol Panah (PC / Laptop)
+       - Virtual Joystick: On-screen touch controller (Ponsel / Tablet / Layar Sentuh)
+       - Tombol Interaksi [E] / Ketuk Layar saat mendekati meja staf pengelola
+       - Sinkronisasi Real-Time posisi avatar via MQTT ke pengunjung lain
+       ===================================================================== */
+    window.MANUAL_CONTROL = {
+      active: false,
+      speed: 2.85,
+      turnSpeed: 10.0,
+      keys: {
+        forward: false,
+        backward: false,
+        left: false,
+        right: false
+      },
+      joystick: {
+        active: false,
+        pointerId: null,
+        centerX: 0,
+        centerY: 0,
+        maxRadius: 46,
+        vectorX: 0,
+        vectorY: 0
+      },
+      currentNearbyPoint: null,
+      lastPublishTime: 0,
+      lastPublishX: 0,
+      lastPublishZ: 0,
+      isMoving: false
+    };
+
+    const MANUAL_INTERACTIVE_POINTS = [
+      {
+        id: 'kara',
+        name: 'Resepsionis Mbak Kara',
+        x: -8.7,
+        z: -1.0,
+        radius: 2.2,
+        icon: 'ph-chat-circle-dots',
+        label: 'Sapa Mbak Kara & Buka Profil Koperasi',
+        action: () => { if (typeof openReceptionModal === 'function') openReceptionModal('profil'); }
+      },
+      {
+        id: 'fedrik',
+        name: 'Meja Manajer Koperasi (Pak Fedrik)',
+        x: -2.95,
+        z: -2.82,
+        radius: 2.1,
+        icon: 'ph-briefcase',
+        label: 'Buka Layanan Manajer Koperasi (Pak Fedrik)',
+        action: () => {
+          const st = window.STAFF_ROSTER && window.STAFF_ROSTER.find(s => s.id === 'fedrik');
+          if (st && typeof selectStaff === 'function') selectStaff(st);
+        }
+      },
+      {
+        id: 'sri_rika',
+        name: 'Meja Pelayanan Keuangan (Mbak Sri & Mbak Rika)',
+        x: -6.0,
+        z: 2.2,
+        radius: 2.3,
+        icon: 'ph-hand-coins',
+        label: 'Buka Formulir Pinjaman & Simpanan (Mbak Sri & Rika)',
+        action: () => {
+          const st = window.STAFF_ROSTER && window.STAFF_ROSTER.find(s => s.id === 'sri');
+          if (st && typeof selectStaff === 'function') selectStaff(st);
+        }
+      },
+      {
+        id: 'zahrah',
+        name: 'Meja Konsultasi Tour & Travel (Mbak Zahrah)',
+        x: -2.95,
+        z: 2.82,
+        radius: 2.1,
+        icon: 'ph-airplane-takeoff',
+        label: 'Buka Layanan Tiket & Umroh (Mbak Zahrah)',
+        action: () => {
+          const st = window.STAFF_ROSTER && window.STAFF_ROSTER.find(s => s.id === 'zahrah');
+          if (st && typeof selectStaff === 'function') selectStaff(st);
+        }
+      },
+      {
+        id: 'mahmuda',
+        name: 'Meja Manajer Adamart (Ibu Mahmudah)',
+        x: 2.95,
+        z: -2.82,
+        radius: 2.1,
+        icon: 'ph-storefront',
+        label: 'Buka Informasi Manajerial Toko Adamart',
+        action: () => {
+          const st = window.STAFF_ROSTER && window.STAFF_ROSTER.find(s => s.id === 'mahmuda');
+          if (st && typeof selectStaff === 'function') selectStaff(st);
+        }
+      },
+      {
+        id: 'sahap',
+        name: 'Meja Kasir Adamart 73 (M. Sahap)',
+        x: 2.95,
+        z: 2.82,
+        radius: 2.1,
+        icon: 'ph-barcode',
+        label: 'Buka Layanan Kasir Adamart 73 (M. Sahap)',
+        action: () => {
+          const st = window.STAFF_ROSTER && window.STAFF_ROSTER.find(s => s.id === 'sahap');
+          if (st && typeof selectStaff === 'function') selectStaff(st);
+        }
+      },
+      {
+        id: 'kasir_kelanis',
+        name: 'Meja Kasir Adamart Kelanis (Azimah)',
+        x: 6.0,
+        z: 2.82,
+        radius: 2.1,
+        icon: 'ph-shopping-cart',
+        label: 'Buka Layanan Kasir Adamart Kelanis (Azimah)',
+        action: () => {
+          const st = window.STAFF_ROSTER && window.STAFF_ROSTER.find(s => s.id === 'kasir-kelanis');
+          if (st && typeof selectStaff === 'function') selectStaff(st);
+        }
+      },
+      {
+        id: 'gallery',
+        name: 'Galeri Dinding Penghargaan & Prestasi',
+        x: -9.8,
+        z: 6.2,
+        radius: 2.3,
+        icon: 'ph-trophy',
+        label: 'Lihat Piagam & Penghargaan Koperasi',
+        action: () => { if (typeof openWallCertificatesModal === 'function') openWallCertificatesModal(); }
+      },
+      {
+        id: 'signboard',
+        name: 'Papan Plang Nama Resmi Koperasi',
+        x: -9.8,
+        z: 2.3,
+        radius: 2.3,
+        icon: 'ph-shield-check',
+        label: 'Lihat Plang Nama Resmi & Logo AKM',
+        action: () => { if (typeof openSignboardModal === 'function') openSignboardModal(); }
+      },
+      {
+        id: 'foto_pengurus',
+        name: 'Foto Jajaran Pengurus Koperasi',
+        x: -8.65,
+        z: -6.8,
+        radius: 2.3,
+        icon: 'ph-users',
+        label: 'Lihat Foto Jajaran Pengurus Koperasi',
+        action: () => { if (typeof openPengurusPhotoModal === 'function') openPengurusPhotoModal(); }
+      },
+      {
+        id: 'foto_pengelola',
+        name: 'Foto Jajaran Pengelola Koperasi',
+        x: -10.0,
+        z: -4.5,
+        radius: 2.3,
+        icon: 'ph-user-focus',
+        label: 'Lihat Foto Jajaran Pengelola Koperasi',
+        action: () => { if (typeof openPengelolaPhotoModal === 'function') openPengelolaPhotoModal(); }
+      },
+      {
+        id: 'adamart_snack',
+        name: 'Rak Makanan Ringan Toko Adamart',
+        x: 8.0,
+        z: 0.5,
+        radius: 2.3,
+        icon: 'ph-basket',
+        label: 'Lihat Katalog Produk & Sembako Adamart',
+        action: () => { if (typeof openAdamartStoreModal === 'function') openAdamartStoreModal(); }
+      },
+      {
+        id: 'adamart_chiller',
+        name: 'Kulkas Display Minuman Dingin',
+        x: 8.2,
+        z: -5.2,
+        radius: 2.3,
+        icon: 'ph-snowflake',
+        label: 'Lihat Display Minuman Dingin Adamart',
+        action: () => { if (typeof openAdamartStoreModal === 'function') openAdamartStoreModal(); }
+      }
+    ];
+
+    function initManualControlSystem() {
+      // 1. Keyboard event listeners
+      window.addEventListener('keydown', (e) => {
+        if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+
+        const k = window.MANUAL_CONTROL.keys;
+        let handled = false;
+
+        if (e.code === 'KeyW' || e.code === 'ArrowUp') {
+          k.forward = true; handled = true;
+        } else if (e.code === 'KeyS' || e.code === 'ArrowDown') {
+          k.backward = true; handled = true;
+        } else if (e.code === 'KeyA' || e.code === 'ArrowLeft') {
+          k.left = true; handled = true;
+        } else if (e.code === 'KeyD' || e.code === 'ArrowRight') {
+          k.right = true; handled = true;
+        } else if (e.code === 'KeyE' || e.code === 'Space') {
+          if (window.MANUAL_CONTROL.currentNearbyPoint) {
+            triggerCurrentNearbyAction();
+            handled = true;
+          }
+        }
+
+        if (handled && !window.MANUAL_CONTROL.active) {
+          // Otomatis aktifkan mode manual jika user menekan tombol jalan
+          toggleManualControlMode(true, true);
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+
+        const k = window.MANUAL_CONTROL.keys;
+        if (e.code === 'KeyW' || e.code === 'ArrowUp') k.forward = false;
+        if (e.code === 'KeyS' || e.code === 'ArrowDown') k.backward = false;
+        if (e.code === 'KeyA' || e.code === 'ArrowLeft') k.left = false;
+        if (e.code === 'KeyD' || e.code === 'ArrowRight') k.right = false;
+      });
+
+      // 2. Virtual Joystick pointer event listeners
+      const joystickBase = document.getElementById('joystick-base');
+      const joystickKnob = document.getElementById('joystick-knob');
+      const joy = window.MANUAL_CONTROL.joystick;
+
+      if (joystickBase && joystickKnob) {
+        const updateKnobPosition = (clientX, clientY) => {
+          let dx = clientX - joy.centerX;
+          let dy = clientY - joy.centerY;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist > joy.maxRadius) {
+            dx = (dx / dist) * joy.maxRadius;
+            dy = (dy / dist) * joy.maxRadius;
+          }
+
+          joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+          joy.vectorX = dx / joy.maxRadius;
+          joy.vectorY = -(dy / joy.maxRadius); // Positif ke atas / maju
+        };
+
+        const resetKnob = () => {
+          joy.active = false;
+          joy.pointerId = null;
+          joy.vectorX = 0;
+          joy.vectorY = 0;
+          joystickKnob.style.transform = 'translate(0px, 0px)';
+        };
+
+        joystickBase.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const rect = joystickBase.getBoundingClientRect();
+          joy.centerX = rect.left + rect.width / 2;
+          joy.centerY = rect.top + rect.height / 2;
+          joy.maxRadius = (rect.width / 2) - 10;
+          joy.active = true;
+          joy.pointerId = e.pointerId;
+          joystickBase.setPointerCapture(e.pointerId);
+          updateKnobPosition(e.clientX, e.clientY);
+        });
+
+        joystickBase.addEventListener('pointermove', (e) => {
+          if (!joy.active || e.pointerId !== joy.pointerId) return;
+          e.preventDefault();
+          e.stopPropagation();
+          updateKnobPosition(e.clientX, e.clientY);
+        });
+
+        joystickBase.addEventListener('pointerup', (e) => {
+          if (e.pointerId === joy.pointerId) {
+            e.preventDefault();
+            resetKnob();
+          }
+        });
+
+        joystickBase.addEventListener('pointercancel', (e) => {
+          resetKnob();
+        });
+      }
+    }
+
+    function toggleManualControlMode(enable, silent = false) {
+      if (enable === undefined) {
+        enable = !window.MANUAL_CONTROL.active;
+      }
+
+      window.MANUAL_CONTROL.active = enable;
+
+      const headerBtn = document.getElementById('header-btn-manual-control');
+      const headerLabel = document.getElementById('header-label-manual-control');
+      const hudBtn = document.getElementById('btn-hud-manual-control');
+      const hudLabel = document.getElementById('label-hud-manual-control');
+      const joystickContainer = document.getElementById('virtual-joystick-container');
+      const bottomBar = document.getElementById('manual-control-bottom-bar');
+      const promptEl = document.getElementById('manual-interaction-prompt');
+
+      const s = window.VISITOR_SYSTEM && window.VISITOR_SYSTEM.self;
+
+      if (enable) {
+        // Tampilan tombol aktif
+        if (headerBtn) {
+          headerBtn.classList.add('bg-amber-500/30', 'text-amber-200', 'border-amber-400');
+          headerBtn.classList.remove('bg-white/5', 'text-amber-300');
+        }
+        if (headerLabel) headerLabel.textContent = '🎮 Manual: ON';
+
+        if (hudBtn) {
+          hudBtn.classList.add('bg-emerald-500/40', 'text-emerald-100', 'border-emerald-400');
+        }
+        if (hudLabel) hudLabel.textContent = 'Manual: ON';
+
+        if (joystickContainer) joystickContainer.classList.remove('hidden');
+        if (bottomBar) bottomBar.classList.remove('hidden');
+
+        // Pastikan kamera dalam sudut pandang 3rd person follow karakter
+        if (s) {
+          if (typeof startThirdPersonFollow === 'function') {
+            startThirdPersonFollow(s);
+          }
+        }
+
+        if (!silent && typeof showToastNotification === 'function') {
+          showToastNotification('🎮 <strong>Kendali Manual Aktif:</strong> Gunakan <b>W A S D</b> atau <b>Joystick</b> di ponsel untuk berjalan bebas.');
+        }
+      } else {
+        // Matikan mode manual
+        if (headerBtn) {
+          headerBtn.classList.remove('bg-amber-500/30', 'text-amber-200', 'border-amber-400');
+          headerBtn.classList.add('text-amber-300');
+        }
+        if (headerLabel) headerLabel.textContent = 'Kendali Manual';
+
+        if (hudBtn) {
+          hudBtn.classList.remove('bg-emerald-500/40', 'text-emerald-100', 'border-emerald-400');
+        }
+        if (hudLabel) hudLabel.textContent = 'Jalan Manual';
+
+        if (joystickContainer) joystickContainer.classList.add('hidden');
+        if (bottomBar) bottomBar.classList.add('hidden');
+        if (promptEl) promptEl.classList.add('hidden');
+
+        // Kembalikan pose berdiri
+        if (s && s.mesh) {
+          if (typeof applyVisitorStandingPose === 'function') {
+            applyVisitorStandingPose(s.mesh);
+          }
+          s.state = 'IDLE';
+          s.currentActivity = 'Berkunjung (Mode Otomatis)';
+          s.stateTimer = 8;
+          if (typeof updateVisitorHud === 'function') updateVisitorHud(s);
+          if (typeof publishPresence === 'function') publishPresence('update');
+        }
+
+        if (!silent && typeof showToastNotification === 'function') {
+          showToastNotification('🧭 Kembali ke Mode Otomatis.');
+        }
+      }
+    }
+
+    function triggerCurrentNearbyAction() {
+      const p = window.MANUAL_CONTROL.currentNearbyPoint;
+      if (p && typeof p.action === 'function') {
+        p.action();
+      }
+    }
+
+    function updateManualControlSystem(delta) {
+      const mc = window.MANUAL_CONTROL;
+      if (!mc.active) return;
+
+      const s = window.VISITOR_SYSTEM && window.VISITOR_SYSTEM.self;
+      if (!s || !s.mesh) return;
+
+      // 1. Dapatkan vektor arah kamera di bidang datar (X-Z)
+      const camDir = new THREE.Vector3();
+      camera.getWorldDirection(camDir);
+      camDir.y = 0;
+      if (camDir.lengthSq() > 0.0001) camDir.normalize();
+
+      const rightDir = new THREE.Vector3(-camDir.z, 0, camDir.x);
+
+      // 2. Hitung input dari keyboard + joystick
+      let inputForward = 0;
+      let inputRight = 0;
+
+      if (mc.keys.forward) inputForward += 1.0;
+      if (mc.keys.backward) inputForward -= 1.0;
+      if (mc.keys.right) inputRight += 1.0;
+      if (mc.keys.left) inputRight -= 1.0;
+
+      if (mc.joystick.active) {
+        inputRight += mc.joystick.vectorX;
+        inputForward += mc.joystick.vectorY;
+      }
+
+      let inputMag = Math.hypot(inputForward, inputRight);
+      if (inputMag > 1.0) {
+        inputForward /= inputMag;
+        inputRight /= inputMag;
+        inputMag = 1.0;
+      }
+
+      // 3. Proses perpindahan karakter jika ada input gerakan
+      if (inputMag > 0.05) {
+        const moveX = (camDir.x * inputForward + rightDir.x * inputRight) * inputMag;
+        const moveZ = (camDir.z * inputForward + rightDir.z * inputRight) * inputMag;
+
+        const moveStep = mc.speed * delta;
+        s.curX += moveX * moveStep;
+        s.curZ += moveZ * moveStep;
+
+        // Batas keliling ruangan kantor & minimarket (Boundary Clamping)
+        s.curX = Math.max(-11.5, Math.min(11.5, s.curX));
+        s.curZ = Math.max(-7.2, Math.min(7.2, s.curZ));
+
+        s.mesh.position.set(s.curX, 0, s.curZ);
+
+        // Putar avatar menghadap ke arah jalannya secara halus
+        const targetHeading = Math.atan2(moveX, moveZ);
+        let diff = targetHeading - (s.heading || 0);
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        s.heading = (s.heading || 0) + diff * Math.min(1, mc.turnSpeed * delta);
+        s.mesh.rotation.y = s.heading;
+
+        // Animasi ayunan langkah kaki & lengan berjalan
+        s.walkCycle = (s.walkCycle || 0) + delta * 9.0;
+        const swing = Math.sin(s.walkCycle) * 0.45;
+        if (s.mesh.userData.leftLeg) s.mesh.userData.leftLeg.rotation.x = swing;
+        if (s.mesh.userData.rightLeg) s.mesh.userData.rightLeg.rotation.x = -swing;
+        if (s.mesh.userData.leftArm) s.mesh.userData.leftArm.rotation.x = -swing * 0.7;
+        if (s.mesh.userData.rightArm) s.mesh.userData.rightArm.rotation.x = swing * 0.7;
+        if (s.mesh.userData.torso) s.mesh.userData.torso.position.y = 0.95 + Math.abs(Math.sin(s.walkCycle)) * 0.035;
+
+        s.state = 'WALKING';
+        s.currentActivity = 'Berjalan (Kendali Mandiri)';
+        if (typeof updateVisitorHud === 'function') updateVisitorHud(s);
+
+        mc.isMoving = true;
+
+        // 4. Publikasikan posisi baru via MQTT secara berkala (throttled ~120ms)
+        const now = Date.now();
+        if (now - mc.lastPublishTime > 120 || Math.hypot(s.curX - mc.lastPublishX, s.curZ - mc.lastPublishZ) > 0.4) {
+          mc.lastPublishTime = now;
+          mc.lastPublishX = s.curX;
+          mc.lastPublishZ = s.curZ;
+          if (typeof publishPresence === 'function') publishPresence('update');
+        }
+      } else {
+        // Berhenti / Idle saat tidak ada tombol yang ditekan
+        if (mc.isMoving) {
+          mc.isMoving = false;
+          if (typeof applyVisitorStandingPose === 'function') applyVisitorStandingPose(s.mesh);
+          s.state = 'IDLE';
+          s.currentActivity = 'Berdiri (Kendali Mandiri)';
+          if (typeof updateVisitorHud === 'function') updateVisitorHud(s);
+          if (typeof publishPresence === 'function') publishPresence('update');
+        }
+      }
+
+      // 5. Deteksi kedekatan interaktif dengan meja pengelola & wahana (Proximity Detection)
+      let closestPoint = null;
+      let minDistance = 999;
+
+      for (let i = 0; i < MANUAL_INTERACTIVE_POINTS.length; i++) {
+        const pt = MANUAL_INTERACTIVE_POINTS[i];
+        const dist = Math.hypot(pt.x - s.curX, pt.z - s.curZ);
+        if (dist <= pt.radius && dist < minDistance) {
+          minDistance = dist;
+          closestPoint = pt;
+        }
+      }
+
+      mc.currentNearbyPoint = closestPoint;
+      const promptEl = document.getElementById('manual-interaction-prompt');
+      const promptText = document.getElementById('manual-interaction-text');
+
+      if (closestPoint && promptEl && promptText) {
+        promptText.innerHTML = `<span class="text-emerald-300 font-bold"><i class="ph ${closestPoint.icon}"></i> ${closestPoint.name}:</span> <span class="text-white font-medium">Ketuk / Tekan [E] untuk Buka</span>`;
+        promptEl.classList.remove('hidden');
+        promptEl.classList.add('flex');
+      } else if (promptEl) {
+        promptEl.classList.add('hidden');
+        promptEl.classList.remove('flex');
       }
     }
 
@@ -11155,7 +11664,12 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
           
           <button type="button" onclick="focusOnSelfAvatar()" class="py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-amber-500/25 to-amber-600/25 hover:from-amber-500/40 hover:to-amber-600/40 text-amber-200 hover:text-white font-bold text-xs flex items-center justify-center gap-2 border border-amber-500/50 transition-all shadow-lg shadow-amber-500/10 cursor-pointer" title="Ikuti karakter Anda dari sudut pandang orang ketiga (3rd Person View)">
             <i class="ph ph-video-camera text-base text-amber-400"></i>
-            <span>🎥 3rd Person View (Ikuti Saya)</span>
+            <span>🎥 3rd Person View</span>
+          </button>
+
+          <button type="button" onclick="toggleManualControlMode(true); closeVisitorModal();" class="py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-emerald-600/30 to-teal-600/30 hover:from-emerald-600/50 hover:to-teal-600/50 text-emerald-200 hover:text-white font-bold text-xs flex items-center justify-center gap-2 border border-emerald-500/50 transition-all shadow-lg shadow-emerald-500/10 cursor-pointer" title="Kendalikan karakter sendiri secara manual menggunakan WASD atau Joystick ponsel">
+            <i class="ph ph-game-controller text-base text-emerald-400"></i>
+            <span>🎮 Kendali Manual (WASD / Joystick)</span>
           </button>
 
           <button type="button" onclick="teleportSelfToEntrance()" class="py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-1.5 border border-white/15 transition-all" title="Mulai jalan dari pintu masuk depan">
@@ -11182,6 +11696,9 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
     <button id="btn-toggle-tpp-mode" onclick="toggleThirdPersonLock()" class="px-2 py-0.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-[10.5px] font-bold border border-amber-500/30 transition-all flex items-center gap-1 cursor-pointer" title="Ganti antara Kunci Belakang Karakter atau Putar Bebas">
       <i class="ph ph-lock-key text-xs" id="icon-tpp-mode"></i> <span id="label-tpp-mode">Kunci Belakang</span>
     </button>
+    <button id="btn-hud-manual-control" onclick="toggleManualControlMode()" class="px-2 py-0.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 text-[10.5px] font-bold border border-emerald-500/30 transition-all flex items-center gap-1 cursor-pointer" title="Aktifkan / Nonaktifkan Kendali Manual WASD & Joystick">
+      <i class="ph ph-game-controller text-xs text-emerald-400"></i> <span id="label-hud-manual-control">Jalan Manual</span>
+    </button>
     <button onclick="exitThirdPersonMode()" class="px-2 py-0.5 rounded-lg bg-white/10 hover:bg-rose-500/30 hover:text-rose-200 text-slate-300 text-[10.5px] font-bold border border-white/15 transition-all flex items-center gap-1 cursor-pointer" title="Lepas kamera dan kembali ke pandangan bebas">
       <i class="ph ph-x text-xs"></i> <span>Lepas Kamera</span>
     </button>
@@ -11201,6 +11718,39 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
     <div id="desk-visit-banner-links" class="flex flex-wrap gap-2">
       <!-- Dynamic Quick Action Links -->
     </div>
+  </div>
+
+  <!-- ON-SCREEN VIRTUAL JOYSTICK (KENDALI MANUAL PONSEL / TABLET) -->
+  <div id="virtual-joystick-container" class="fixed bottom-14 left-4 sm:left-8 z-40 hidden select-none touch-none pointer-events-auto">
+    <div id="joystick-base" class="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-900/85 backdrop-blur-md border-2 border-amber-500/60 shadow-2xl flex items-center justify-center cursor-pointer ring-4 ring-black/40">
+      <div class="absolute top-1.5 left-1/2 -translate-x-1/2 text-amber-400/60 text-[10px] font-black pointer-events-none">▲</div>
+      <div class="absolute bottom-1.5 left-1/2 -translate-x-1/2 text-amber-400/60 text-[10px] font-black pointer-events-none">▼</div>
+      <div class="absolute left-1.5 top-1/2 -translate-y-1/2 text-amber-400/60 text-[10px] font-black pointer-events-none">◀</div>
+      <div class="absolute right-1.5 top-1/2 -translate-y-1/2 text-amber-400/60 text-[10px] font-black pointer-events-none">▶</div>
+      <!-- Draggable Amber Thumbstick Knob (Persis seperti pada foto acuan user) -->
+      <div id="joystick-knob" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-white/60 shadow-lg shadow-amber-500/50 pointer-events-none transform transition-transform duration-75"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM MANUAL CONTROL INSTRUCTION BAR (PERSIS SEPERTI GAMBAR CONTOH USER) -->
+  <div id="manual-control-bottom-bar" class="fixed bottom-2 left-1/2 -translate-x-1/2 z-40 hidden flex items-center justify-between gap-3 px-3.5 py-1.5 sm:py-2 rounded-2xl bg-slate-950/92 backdrop-blur-md border border-amber-500/50 shadow-2xl text-slate-200 max-w-[96vw] sm:max-w-2xl pointer-events-auto transition-all duration-300">
+    <div class="flex items-center gap-2 min-w-0">
+      <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 text-xs sm:text-sm">
+        <i class="ph ph-game-controller"></i>
+      </div>
+      <p class="text-[10px] sm:text-xs font-medium text-slate-300 truncate">
+        <strong class="text-amber-300 font-bold">W A S D</strong> atau tombol panah untuk berjalan (joystick di ponsel). Dekati meja staf untuk membuka layanan.
+      </p>
+    </div>
+    <button onclick="toggleManualControlMode(false)" class="px-2.5 py-1 rounded-xl bg-white/10 hover:bg-rose-500/30 text-slate-300 hover:text-rose-200 text-[10px] sm:text-[11px] font-bold border border-white/15 transition-all flex items-center gap-1 cursor-pointer shrink-0" title="Kembali ke Mode Otomatis / Pandangan Bebas">
+      <i class="ph ph-arrow-u-up-left"></i> <span class="hidden sm:inline">Mode Otomatis</span><span class="sm:hidden">Keluar</span>
+    </button>
+  </div>
+
+  <!-- FLOATING INTERACTION PROMPT NEAR DESK (MUNCUL KETIKA KARAKTER MENDEKATI MEJA) -->
+  <div id="manual-interaction-prompt" class="fixed bottom-14 sm:bottom-16 left-1/2 -translate-x-1/2 z-40 hidden items-center gap-2 px-3.5 sm:px-4 py-2 rounded-full bg-gradient-to-r from-emerald-600/95 via-teal-600/95 to-cyan-600/95 backdrop-blur-md border border-emerald-400/60 shadow-2xl text-white pointer-events-auto animate-bounce duration-1000 cursor-pointer" onclick="triggerCurrentNearbyAction()">
+    <i class="ph ph-hand-pointing text-base text-emerald-200 animate-pulse"></i>
+    <span id="manual-interaction-text" class="text-xs font-bold text-white">Dekat Meja: Ketuk / Tekan [E] untuk Buka Layanan</span>
   </div>
 
 </body>
