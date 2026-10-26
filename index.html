@@ -56,18 +56,14 @@
 
     .hud-label {
       pointer-events: auto;
-      transform: translate(-50%, -100%) scale(0.68);
-      transform-origin: bottom center;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 2px;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;
-    }
-    .hud-label:hover {
-      transform: translate(-50%, -100%) scale(0.82);
-      z-index: 50;
+      margin-top: -24px;
+      user-select: none;
+      z-index: 25;
     }
     .hud-bubble-action {
       background: rgba(15, 23, 42, 0.95);
@@ -95,16 +91,24 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
     .hud-bubble-name {
-      background: rgba(15, 23, 42, 0.88);
+      background: rgba(15, 23, 42, 0.90);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.18);
-      padding: 2px 7px;
+      padding: 2.5px 7.5px;
       border-radius: 9999px;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
       white-space: nowrap;
       display: flex;
       align-items: center;
       gap: 4px;
+      transform: scale(0.82);
+      transform-origin: center bottom;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s;
+    }
+    .hud-label:hover .hud-bubble-name,
+    .hud-label.active-selected .hud-bubble-name {
+      transform: scale(0.96);
+      border-color: rgba(99, 102, 241, 0.6);
     }
     
     /* ==============================================================
@@ -287,35 +291,36 @@
     * { scrollbar-width: thin; scrollbar-color: rgba(148, 163, 184, 0.35) transparent; }
 
     @media (max-width: 768px) {
-      /* Mode Layar HP / Ponsel: Tampilkan balon nama dan jam absen masuk secara proporsional & jelas */
+      /* Mode Layar HP / Ponsel: Tampilkan balon nama dan jam absen masuk tepat di atas kepala NPC */
       .hud-label {
         display: flex !important;
-        transform: translate(-50%, -100%) scale(0.62) !important;
-        transform-origin: bottom center;
+        margin-top: -20px !important;
         z-index: 30;
       }
-      .hud-label.active-selected {
-        transform: translate(-50%, -100%) scale(0.78) !important;
-        z-index: 60;
-      }
-      .hud-label.active-selected .hud-bubble-action {
-        display: flex !important;
-      }
-      .hud-bubble-name {
+      .hud-label .hud-bubble-name {
+        transform: scale(0.70) !important;
+        transform-origin: center bottom;
         font-size: 9.5px !important;
-        padding: 2px 7.5px !important;
+        padding: 2px 7px !important;
         border-radius: 9999px !important;
         background: rgba(15, 23, 42, 0.94) !important;
         border: 1px solid rgba(255, 255, 255, 0.25) !important;
         gap: 3.5px !important;
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
       }
+      .hud-label.active-selected .hud-bubble-name {
+        transform: scale(0.88) !important;
+      }
+      .hud-label.active-selected .hud-bubble-action {
+        display: flex !important;
+        transform: scale(0.72) !important;
+        transform-origin: center bottom;
+      }
       .hud-bubble-name .checkin-badge {
         font-size: 8px !important;
       }
       .hud-tag-desk {
         display: inline-flex !important;
-        transform: translate(-50%, -100%) scale(0.68) !important;
       }
     }
   </style>
@@ -2271,10 +2276,21 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       nameplate.position.set(0, 1.16, 0.42);
       g.add(nameplate);
 
-      // Executive Chair (tucked neatly into desk)
-      const chair = createOfficeChair(0x1e1e24);
+      // Executive Ergonomic Chair (Pak Fedrik - Black Leather with Headrest & Armrests)
+      const chair = createOfficeChair({ color: 0x18181b, isExecutive: true, hasHeadrest: true, metalColor: 0xf1f5f9 });
       chair.position.set(0, 0, -0.68);
       g.add(chair);
+
+      // Guest Visitor Chairs (2 Kursi Tamu di Depan Meja Manajer Koperasi)
+      const guestChair1 = createOfficeChair({ color: 0x334155, isExecutive: false, hasHeadrest: false });
+      guestChair1.position.set(-0.62, 0, 0.85);
+      guestChair1.rotation.y = Math.PI;
+      g.add(guestChair1);
+
+      const guestChair2 = createOfficeChair({ color: 0x334155, isExecutive: false, hasHeadrest: false });
+      guestChair2.position.set(0.62, 0, 0.85);
+      guestChair2.rotation.y = Math.PI;
+      g.add(guestChair2);
 
       scene.add(g);
     }
@@ -2327,10 +2343,21 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       nameplate.position.set(0.35, 1.11, 0.32);
       g.add(nameplate);
 
-      // Chair (tucked neatly into desk)
-      const chair = createOfficeChair(0x065f46);
+      // Executive Ergonomic Chair (Ibu Mahmudah - Forest Green / Dark Emerald Leather with Headrest & Armrests)
+      const chair = createOfficeChair({ color: 0x064e3b, isExecutive: true, hasHeadrest: true, metalColor: 0xf1f5f9 });
       chair.position.set(0, 0, -0.62);
       g.add(chair);
+
+      // Guest Consultation Chairs (2 Kursi Tamu Mitra Supplier / Toko Adamart)
+      const guestChairAda1 = createOfficeChair({ color: 0x334155, isExecutive: false, hasHeadrest: false });
+      guestChairAda1.position.set(-0.55, 0, 0.78);
+      guestChairAda1.rotation.y = Math.PI;
+      g.add(guestChairAda1);
+
+      const guestChairAda2 = createOfficeChair({ color: 0x334155, isExecutive: false, hasHeadrest: false });
+      guestChairAda2.position.set(0.55, 0, 0.78);
+      guestChairAda2.rotation.y = Math.PI;
+      g.add(guestChairAda2);
 
       scene.add(g);
     }
@@ -2338,7 +2365,11 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
     /* 3. MEJA BAGIAN KEUANGAN (MBAK SRI & MBAK RIKA) */
     function buildFinanceDesks() {
       // Workstation 1: Mbak Sri (Keuangan & Kas)
-      const g1 = createWorkstation('Meja Keuangan (Mbak Sri)', 0x6366f1);
+      const g1 = createWorkstation('Meja Keuangan (Mbak Sri)', 0x6366f1, {
+        color: 0x312e81, // Deep Indigo Leather khas Keuangan & Kas
+        isExecutive: false,
+        hasHeadrest: true
+      });
       g1.position.set(-7.4, 0, 1.8);
       g1.rotation.y = Math.PI / 2;
 
@@ -2356,7 +2387,11 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       scene.add(g1);
 
       // Workstation 2: Mbak Rika (Keuangan & Pembukuan)
-      const g2 = createWorkstation('Meja Keuangan (Mbak Rika)', 0x8b5cf6);
+      const g2 = createWorkstation('Meja Keuangan (Mbak Rika)', 0x8b5cf6, {
+        color: 0x4c1d95, // Deep Violet Leather khas Pembukuan & Pajak
+        isExecutive: false,
+        hasHeadrest: true
+      });
       g2.position.set(-7.4, 0, 4.4);
       g2.rotation.y = Math.PI / 2;
 
@@ -2384,7 +2419,7 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       scene.add(dial);
     }
 
-    function createWorkstation(label, glowColor = 0x38bdf8) {
+    function createWorkstation(label, glowColor = 0x38bdf8, chairConfig = {}) {
       const g = new THREE.Group();
       const top = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.1, 0.9), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 }));
       top.position.y = 1.05;
@@ -2409,10 +2444,16 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       book.position.set(0.6, 1.14, -0.15);
       g.add(book);
 
-      // Chair tucked in facing into the desk
-      const chair = createOfficeChair();
+      // Ergonomic Staff Chair (Kursi staf ergonomis yang diduduki Mbak Sri / Mbak Rika)
+      const chair = createOfficeChair(chairConfig);
       chair.position.set(0, 0, -0.62);
       g.add(chair);
+
+      // Guest / Member Consultation Chair (Kursi konsultasi anggota koperasi di hadapan meja)
+      const guestChair = createOfficeChair({ color: 0x334155, isExecutive: false, hasHeadrest: false });
+      guestChair.position.set(0, 0, 0.72);
+      guestChair.rotation.y = Math.PI; // Menghadap staf / meja kerja
+      g.add(guestChair);
 
       return g;
     }
@@ -2467,17 +2508,17 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       g.add(nameplateTravel);
 
       // Consultant Chair (Zahrah - tucked into desk facing -Z)
-      const chair = createOfficeChair(0x0369a1);
+      const chair = createOfficeChair({ color: 0x0369a1, isExecutive: false, hasHeadrest: true });
       chair.position.set(0, 0, 0.62);
       chair.rotation.y = Math.PI;
       g.add(chair);
 
       // Customer Consultation Chairs (2 front chairs)
-      const custChair1 = createOfficeChair(0x334155);
+      const custChair1 = createOfficeChair({ color: 0x334155, isExecutive: false, hasHeadrest: false });
       custChair1.position.set(-0.55, 0, -0.78);
       g.add(custChair1);
 
-      const custChair2 = createOfficeChair(0x334155);
+      const custChair2 = createOfficeChair({ color: 0x334155, isExecutive: false, hasHeadrest: false });
       custChair2.position.set(0.55, 0, -0.78);
       g.add(custChair2);
 
@@ -3575,19 +3616,138 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       // agar kulkas display minuman dingin Adamart terlihat bersih, lapang, dan tidak bertumpuk
     }
 
-    function createOfficeChair(color = 0x1e293b) {
+    function createOfficeChair({
+      color = 0x1e293b,
+      isExecutive = false,
+      hasHeadrest = false,
+      metalColor = 0xd1d5db
+    } = {}) {
+      let cushionColor = typeof arguments[0] === 'number' ? arguments[0] : color;
+      if (typeof arguments[0] === 'object' && arguments[0] !== null) {
+        cushionColor = arguments[0].color || color;
+        isExecutive = arguments[0].isExecutive || false;
+        hasHeadrest = arguments[0].hasHeadrest || false;
+        metalColor = arguments[0].metalColor || 0xd1d5db;
+      }
+
       const g = new THREE.Group();
-      const seat = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.08, 0.55), new THREE.MeshStandardMaterial({ color: color, roughness: 0.5 }));
-      seat.position.y = 0.55;
+
+      const leatherMat = new THREE.MeshStandardMaterial({
+        color: cushionColor,
+        roughness: isExecutive ? 0.35 : 0.55,
+        metalness: isExecutive ? 0.15 : 0.05
+      });
+      const chromeMat = new THREE.MeshStandardMaterial({
+        color: metalColor,
+        metalness: 0.9,
+        roughness: 0.2
+      });
+      const blackPlasticMat = new THREE.MeshStandardMaterial({
+        color: 0x0f172a,
+        roughness: 0.7,
+        metalness: 0.2
+      });
+
+      // 1. Chrome 5-Star Caster Base (Kaki Bintang 5 Beroda di Lantai)
+      const starBase = new THREE.Group();
+      starBase.position.y = 0.08;
+
+      const centerHub = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.06, 16), chromeMat);
+      starBase.add(centerHub);
+
+      const spokeCount = 5;
+      for (let i = 0; i < spokeCount; i++) {
+        const angle = (i * Math.PI * 2) / spokeCount;
+        const spokeGroup = new THREE.Group();
+        spokeGroup.rotation.y = angle;
+
+        // Spoke arm (Batang kaki bintang chrome)
+        const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.035, 0.28), chromeMat);
+        spoke.position.set(0, 0, 0.14);
+        spokeGroup.add(spoke);
+
+        // Caster wheel housing & double wheel (Roda Kursi)
+        const wheelHousing = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.04), blackPlasticMat);
+        wheelHousing.position.set(0, -0.02, 0.27);
+        spokeGroup.add(wheelHousing);
+
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.035, 12), blackPlasticMat);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(0, -0.04, 0.27);
+        spokeGroup.add(wheel);
+
+        starBase.add(spokeGroup);
+      }
+      g.add(starBase);
+
+      // 2. Hydraulic Gas Lift Column (Tiang Hidrolik Chrome)
+      const gasLift = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.038, 0.38, 16), chromeMat);
+      gasLift.position.y = 0.26;
+      g.add(gasLift);
+
+      const gasLiftCollar = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.14, 16), blackPlasticMat);
+      gasLiftCollar.position.y = 0.16;
+      g.add(gasLiftCollar);
+
+      // 3. Under-seat Tilt Mechanism (Rangka & Mekanisme Bawah Kursi)
+      const underMechanism = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.07, 0.30), blackPlasticMat);
+      underMechanism.position.set(0, 0.46, 0);
+      g.add(underMechanism);
+
+      // 4. Ergonomic Padded Seat Cushion (Bantalan Duduk Empuk)
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(0.60, 0.10, 0.58), leatherMat);
+      seat.position.set(0, 0.53, 0);
+      seat.castShadow = true;
       g.add(seat);
 
-      const back = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.55, 0.08), new THREE.MeshStandardMaterial({ color: color, roughness: 0.5 }));
-      back.position.set(0, 0.85, -0.24);
+      // Front Waterfall Edge Cushion (Lengkungan Depan Paha)
+      const frontEdge = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.58, 16), leatherMat);
+      frontEdge.rotation.z = Math.PI / 2;
+      frontEdge.position.set(0, 0.51, 0.28);
+      g.add(frontEdge);
+
+      // 5. Ergonomic Contoured Backrest & Spine Support (Sandaran Punggung Ergonomis)
+      const spine = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.55, 0.05), chromeMat);
+      spine.position.set(0, 0.80, -0.28);
+      spine.rotation.x = 0.08;
+      g.add(spine);
+
+      // Lumbar Support Cushion (Bantalan Penyangga Pinggang)
+      const lumbar = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.14, 0.06), blackPlasticMat);
+      lumbar.position.set(0, 0.72, -0.23);
+      g.add(lumbar);
+
+      // Backrest Cushion
+      const backHeight = isExecutive ? 0.68 : 0.56;
+      const backY = isExecutive ? 0.92 : 0.86;
+      const back = new THREE.Mesh(new THREE.BoxGeometry(0.54, backHeight, 0.08), leatherMat);
+      back.position.set(0, backY, -0.25);
+      back.rotation.x = 0.08;
+      back.castShadow = true;
       g.add(back);
 
-      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.5), new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8 }));
-      leg.position.y = 0.25;
-      g.add(leg);
+      // Headrest (Sandaran Kepala Eksklusif)
+      if (hasHeadrest || isExecutive) {
+        const headrestStem = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.14, 0.03), chromeMat);
+        headrestStem.position.set(0, 1.25, -0.30);
+        g.add(headrestStem);
+
+        const headrestCushion = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.16, 0.08), leatherMat);
+        headrestCushion.position.set(0, 1.32, -0.28);
+        headrestCushion.rotation.x = 0.12;
+        g.add(headrestCushion);
+      }
+
+      // 6. 3D Curved Armrests (Sandaran Tangan Kiri & Kanan - Sangat Terlihat Saat Diduduki)
+      [-0.32, 0.32].forEach((xSide) => {
+        const armStrut = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.25, 0.04), chromeMat);
+        armStrut.position.set(xSide, 0.64, 0);
+        g.add(armStrut);
+
+        const armPad = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.04, 0.28), blackPlasticMat);
+        armPad.position.set(xSide, 0.77, 0.02);
+        g.add(armPad);
+      });
 
       return g;
     }
