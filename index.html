@@ -4224,7 +4224,7 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       // Diposisikan presisi di tengah antara Foto Pengurus (x: -4.5) & TV Screen (x: -1.1)
       // Titik tengah sempurna: x = -2.85, y = 4.80, z = -8.95
       // ===================================================================
-  const officialEmblemTex = getKoperasiEmblemTexture();
+      const officialEmblemTex = getKoperasiEmblemTexture();
 
       const emblemGroup = new THREE.Group();
       // Posisi Presisi di Dinding Belakang: Digeser seimbang ke x = -4.95 (di antara Foto Pengurus & Layar LED TV)
@@ -7950,6 +7950,7 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
             isManualDateSelection = true;
             targetDate = new Date(e.target.value);
             syncPresenceData();
+            fetchAdamartSales();
           }
         });
       }
@@ -7971,8 +7972,13 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
         d = new Date(expectedDate[0], expectedDate[1], expectedDate[2]);
       } else {
         const parts = dateStr.split(/[\/-]/);
-        if (parts.length === 3 && parts[0].length <= 2 && parts[2].length === 4) {
-          expectedDate = [Number(parts[2]), Number(parts[1]) - 1, Number(parts[0])];
+        if (parts.length === 3 && parts[2].length === 4) {
+          const first = Number(parts[0]);
+          const second = Number(parts[1]);
+          // AppSheet returns M/D/YYYY; accept D/M/YYYY when the first value cannot be a month.
+          const month = first > 12 ? second : first;
+          const day = first > 12 ? first : second;
+          expectedDate = [Number(parts[2]), month - 1, day];
           d = new Date(expectedDate[0], expectedDate[1], expectedDate[2]);
         } else if (parts.length === 3 && parts[0].length === 4) {
           expectedDate = [Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])];
@@ -8036,7 +8042,7 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       const modalSyncIcon = document.getElementById('modal-sync-icon');
       if (modalSyncIcon) modalSyncIcon.classList.add('animate-spin');
       const requestController = new AbortController();
-      const requestTimeout = setTimeout(() => requestController.abort(), 10000);
+      const requestTimeout = setTimeout(() => requestController.abort(), 60000);
       setPresenceSyncStatus('Memuat data AppSheet...');
 
       try {
@@ -8249,7 +8255,6 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
         }
 
         updateWallScreenCanvas();
-        fetchAdamartSales();
 
       } catch (e) {
         console.warn('API fetch warning:', e);
@@ -8532,7 +8537,9 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
       initScene();
       animate();
       syncPresenceData();
+      fetchAdamartSales();
       setInterval(syncPresenceData, 120000);
+      setInterval(fetchAdamartSales, 120000);
       initVisitorPresenceSystem();
       initManualControlSystem();
     }
